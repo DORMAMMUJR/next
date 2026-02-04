@@ -1,0 +1,8 @@
+{
+  "name": "Next - Bachillerato Digital",
+  "description": "Plataforma educativa moderna de bachillerato en línea. Innovación, flexibilidad y excelencia académica.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
