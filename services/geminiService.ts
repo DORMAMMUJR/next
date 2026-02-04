@@ -2,13 +2,11 @@
 import { GoogleGenAI } from "@google/genai";
 
 /**
- * Generates a text response from Gemini AI.
- * @param prompt The user's input string.
- * @returns The text response from the AI model.
+ * Genera una respuesta de texto utilizando el modelo Gemini 3 Flash.
+ * @param prompt La consulta del usuario.
  */
 export const getAIResponse = async (prompt: string) => {
-  // Always create a new GoogleGenAI instance right before making an API call 
-  // to ensure it uses the most up-to-date API key from the environment/dialog.
+  // Se crea una instancia nueva para asegurar el uso de la API KEY más reciente del entorno.
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   try {
@@ -16,13 +14,19 @@ export const getAIResponse = async (prompt: string) => {
       model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
-        systemInstruction: "Eres un asistente virtual experto para NEXT Bachillerato Ejecutivo. Proporcionas respuestas claras, profesionales y útiles sobre trámites escolares, materias y soporte técnico. Responde siempre en español.",
+        systemInstruction: `Eres NEXT AI, el asistente virtual de NEXT Bachillerato Ejecutivo. 
+        Tus respuestas deben ser profesionales, empáticas y ejecutivas. 
+        Conoces sobre trámites SEP, RVOE, expedientes digitales y planes de estudio ejecutivos de 18 meses. 
+        Responde siempre en español de México de forma concisa.`,
+        temperature: 0.7,
+        topP: 0.8,
       },
     });
-    // Accessing the .text property directly as it returns the extracted string output.
+
+    // Se accede a la propiedad .text directamente como especifica la documentación de @google/genai.
     return response.text;
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Lo siento, ocurrió un error al procesar tu consulta. Por favor intenta de nuevo.";
+    console.error("Error en Gemini API:", error);
+    return "Lo siento, tuve un problema al procesar tu solicitud académica. ¿Podrías intentar de nuevo o contactar a Control Escolar?";
   }
 };

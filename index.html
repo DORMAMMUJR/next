@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Next | Bachillerato en Línea</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
@@ -18,14 +18,24 @@
                 white: '#ffffff',
                 gray: '#f4f4f5'
               }
+            },
+            borderRadius: {
+              '4xl': '2rem',
+              '5xl': '3rem',
+              '6xl': '4rem',
             }
           }
         }
       }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { 
+          font-family: 'Inter', sans-serif; 
+          scroll-behavior: smooth;
+        }
         .glass-dark { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .selection-green::selection { background-color: #22c55e; color: white; }
     </style>
 <script type="importmap">
 {
@@ -38,7 +48,9 @@
 }
 </script>
 </head>
-<body class="bg-next-white text-next-black">
+<body class="bg-next-white text-next-black selection-green">
     <div id="root"></div>
+    <!-- Punto de entrada crucial para evitar el pantallazo blanco -->
+    <script type="module" src="index.tsx"></script>
 </body>
 </html>
