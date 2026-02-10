@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { CITIES, CITY_KEYS } from './constants';
 import { Alumno, Matricula, Pago, CityData, City, ExpedienteAlumno, DocumentoPDF } from './types';
 import AIAssistant from './components/AIAssistant';
+import LandingPage from './components/LandingPage';
 
 // --- SEED DATA PARA AGUASCALIENTES ---
 const SEED_AGUASCALIENTES: CityData = (() => {
@@ -107,6 +108,7 @@ const SEED_AGUASCALIENTES: CityData = (() => {
 })();
 
 const App: React.FC = () => {
+  const [showLanding, setShowLanding] = useState(true);
   const [currentSlug, setCurrentSlug] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'alumnos' | 'matriculas' | 'pagos' | 'reportes' | 'expedientes'>('alumnos');
@@ -115,6 +117,13 @@ const App: React.FC = () => {
   
   const urlParams = new URLSearchParams(window.location.search);
   const urlKey = urlParams.get('k');
+
+  // Verificar si venimos con parámetros (ej. link directo) para saltar la landing
+  useEffect(() => {
+    if (urlKey || window.location.search.includes('?')) {
+      setShowLanding(false);
+    }
+  }, [urlKey]);
 
   useEffect(() => {
     if (currentSlug) {
@@ -169,6 +178,11 @@ const App: React.FC = () => {
     const requiredKey = CITY_KEYS[currentSlug];
     return !requiredKey || requiredKey === urlKey;
   }, [currentSlug, urlKey]);
+
+  // Si estamos en modo landing, mostramos el componente LandingPage
+  if (showLanding) {
+    return <LandingPage onEnterApp={() => setShowLanding(false)} />;
+  }
 
   if (currentSlug && !isAuthorized) {
     return (
@@ -593,15 +607,15 @@ const App: React.FC = () => {
     return (
       <div className="min-h-screen bg-white p-6 md:p-20 overflow-x-hidden">
         <header className="max-w-7xl mx-auto mb-20 text-center">
-          <h1 className="text-7xl md:text-[10rem] font-black tracking-tighter italic uppercase leading-none">
+          <h1 className="text-7xl md:text-[10rem] font-black tracking-tighter italic uppercase leading-none text-black">
             NEXT<span className="text-next-green">.</span>
           </h1>
-          <p className="text-zinc-400 font-bold uppercase tracking-[0.5em] text-xs mt-8">Panel Administrativo Multisede</p>
+          <p className="text-zinc-900 font-bold uppercase tracking-[0.5em] text-xs mt-8">Panel Administrativo Multisede</p>
           <div className="mt-12 max-w-xl mx-auto">
             <input 
               type="text" 
               placeholder="BUSCAR CIUDAD..." 
-              className="w-full bg-zinc-50 border-none rounded-[32px] px-10 py-6 text-center font-black text-sm uppercase tracking-widest focus:ring-2 focus:ring-next-green outline-none"
+              className="w-full bg-white border-2 border-zinc-200 rounded-[32px] px-10 py-6 text-center font-black text-sm uppercase tracking-widest focus:ring-2 focus:ring-next-green outline-none text-black placeholder:text-zinc-500 shadow-sm"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
@@ -613,12 +627,12 @@ const App: React.FC = () => {
             <button 
               key={city.slug}
               onClick={() => setCurrentSlug(city.slug)}
-              className="group bg-zinc-50 border border-zinc-100 p-10 rounded-[48px] text-left hover:bg-black hover:scale-105 transition-all duration-500 shadow-sm"
+              className="group bg-white border border-zinc-200 p-10 rounded-[48px] text-left hover:bg-black hover:scale-105 transition-all duration-500 shadow-sm"
             >
-              <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1 group-hover:text-next-green transition-colors">REGIÓN MÉXICO</p>
-              <h3 className="text-2xl font-black italic uppercase tracking-tighter group-hover:text-white transition-colors">{city.name}</h3>
+              <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1 group-hover:text-next-green transition-colors">REGIÓN MÉXICO</p>
+              <h3 className="text-2xl font-black italic uppercase tracking-tighter text-black group-hover:text-white transition-colors">{city.name}</h3>
               <div className="mt-8 flex justify-end">
-                <span className="text-3xl opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">→</span>
+                <span className="text-3xl opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 group-hover:text-white">→</span>
               </div>
             </button>
           ))}
@@ -630,7 +644,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col md:flex-row">
       <aside className="w-full md:w-80 bg-zinc-50 border-r border-zinc-100 p-10 flex flex-col fixed md:sticky top-0 h-screen">
-        <button onClick={() => { setCurrentSlug(null); setSelectedAlumnoId(null); }} className="text-2xl font-black italic uppercase tracking-tighter mb-12 hover:opacity-50 transition-opacity">
+        <button onClick={() => { setCurrentSlug(null); setSelectedAlumnoId(null); setShowLanding(true); }} className="text-2xl font-black italic uppercase tracking-tighter mb-12 hover:opacity-50 transition-opacity">
           NEXT<span className="text-next-green">.</span>
         </button>
         
@@ -660,7 +674,7 @@ const App: React.FC = () => {
           ))}
         </nav>
 
-        <button onClick={() => { setCurrentSlug(null); setSelectedAlumnoId(null); }} className="mt-auto pt-10 text-[9px] font-black text-zinc-400 uppercase tracking-widest hover:text-red-500 transition-colors">
+        <button onClick={() => { setCurrentSlug(null); setSelectedAlumnoId(null); setShowLanding(true); }} className="mt-auto pt-10 text-[9px] font-black text-zinc-400 uppercase tracking-widest hover:text-red-500 transition-colors">
           ← Cambiar de Ciudad
         </button>
       </aside>
