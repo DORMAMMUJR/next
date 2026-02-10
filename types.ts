@@ -2,134 +2,83 @@
 export enum Role {
   ALUMNO = 'Alumno',
   PROFESOR = 'Profesor',
-  MAESTRO = 'Maestro',
   CONTROL_ESCOLAR = 'Control Escolar',
-  DIRECCION = 'Dirección',
-  FINANZAS = 'Finanzas'
+  FINANZAS = 'Finanzas',
+  DIRECCION = 'Dirección'
 }
 
 export type AdminSection = 
   | 'dashboard' 
   | 'alumnos' 
-  | 'expedientes' 
-  | 'pagos' 
-  | 'cobranza'
-  | 'facturacion'
-  | 'presupuestos'
-  | 'materias' 
-  | 'profesores' 
-  | 'examenes' 
-  | 'calificaciones' 
   | 'documentacion' 
+  | 'facturacion' 
+  | 'mensajes' 
+  | 'auditoria' 
+  | 'materias' 
   | 'reportes' 
-  | 'alertas' 
-  | 'auditoria'
-  | 'configuracion_fin'
-  | 'contenidos'
-  | 'actividades'
-  | 'mensajes'
-  | 'agenda'
-  | 'perfil'
-  | 'mis_materias'
-  | 'grupos'
+  | 'expedientes' 
   | 'sedes';
 
-export interface User {
+export interface Alumno {
   id: string;
+  nombre_completo: string;
+  telefono: string;
+  email: string;
+  generacion: string;
+  grupo: string;
+  estatus: 'Activo' | 'Baja' | 'Pausa';
+  created_at: string;
+}
+
+export interface DocumentoPDF {
+  file_name: string;
+  mime_type: string;
+  size_bytes: number;
+  uploaded_at: string;
+  base64_data: string;
+}
+
+export interface ExpedienteAlumno {
+  alumno_id: string;
+  docs: {
+    acta_nacimiento?: DocumentoPDF;
+    identificacion?: DocumentoPDF;
+    curp?: DocumentoPDF;
+    certificacion?: DocumentoPDF;
+  };
+  updated_at: string;
+}
+
+export interface Matricula {
+  id: string;
+  alumno_id: string;
+  matricula: string;
+  fecha_inscripcion: string;
+  programa: string;
+  turno: string;
+  modalidad: 'Presencial' | 'En línea' | 'Mixta';
+  expediente_folio: string;
+}
+
+export interface Pago {
+  id: string;
+  alumno_id: string;
+  concepto: 'Inscripción' | 'Mensualidad' | 'Examen' | 'Otro';
+  monto: number;
+  fecha_pago: string;
+  metodo: 'Efectivo' | 'Transferencia' | 'Tarjeta' | 'Otro';
+  estatus: 'Pagado' | 'Pendiente' | 'Vencido';
+  notas?: string;
+}
+
+export interface City {
   name: string;
-  role: Role;
-  avatar: string;
-  enrollment?: string;
+  slug: string;
 }
 
-export interface Student extends User {
-  group: string;
-  academicStatus: 'Regular' | 'Baja' | 'Suspendido' | 'Egresado';
-  paymentStatus: 'Al día' | 'Deudor' | 'Vencido';
-  tutor: string;
-  curp: string;
-  gpa: number;
-  phone?: string;
-  email?: string;
-}
-
-export interface Subject {
-  id: string;
-  name: string;
-  group: string;
-  schedule: string;
-  period: string;
-  status: 'Activa' | 'Concluida' | 'Programada';
-  enrolledStudents: number;
-}
-
-export interface Activity {
-  id: string;
-  subjectId: string;
-  title: string;
-  description: string;
-  dueDate: string;
-  submissionsCount: number;
-  totalStudents: number;
-}
-
-export interface GradeEntry {
-  studentId: string;
-  studentName: string;
-  activityScore: number;
-  examScore: number;
-  finalAverage: number;
-  observations: string;
-}
-
-export interface AuditLog {
-  id: string;
-  user: string;
-  action: string;
-  module: string;
-  timestamp: string;
-}
-
-export interface OfficialDoc {
-  id: string;
-  studentId: string;
-  studentName: string;
-  type: 'Certificado' | 'Historial SEP' | 'RVOE' | 'Carta Académica';
-  status: 'Completo' | 'En proceso' | 'Pendiente';
-  requestDate: string;
-}
-
-export interface ProfessorKPIs {
-  assignedSubjects: number;
-  activeGroups: number;
-  pendingActivities: number;
-  scheduledExams: number;
-  averageGPA: number;
-  totalStudents: number;
-}
-
-export interface ContentItem {
-  id: string;
-  title: string;
-  type: 'PDF' | 'Video' | 'Presentación';
-  week: number;
-  visible: boolean;
-}
-
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  date: string;
-  type: 'Clase' | 'Examen' | 'Entrega' | 'Reunión';
-}
-
-export interface Sede {
-  id: string;
-  name: string;
-  address: string;
-  phone: string;
-  manager: string;
-  activeStudents: number;
-  status: 'Operativa' | 'Mantenimiento' | 'Próximamente';
-  coordinates?: { lat: number; lng: number };
+export interface CityData {
+  alumnos: Alumno[];
+  matriculas: Matricula[];
+  pagos: Pago[];
+  expedientes: ExpedienteAlumno[];
 }

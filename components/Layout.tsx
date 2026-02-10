@@ -23,175 +23,131 @@ const Layout: React.FC<LayoutProps> = ({
   currentAdminSection,
   onAdminSectionChange
 }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isControl = activeRole === Role.CONTROL_ESCOLAR;
   const isFinanzas = activeRole === Role.FINANZAS;
   const isDireccion = activeRole === Role.DIRECCION;
   const isProfesor = activeRole === Role.PROFESOR;
   const isAdminOrStaff = isControl || isFinanzas || isDireccion || isProfesor;
 
-  const [globalSearch, setGlobalSearch] = useState('');
-
   const getAdminMenu = (): { id: AdminSection; label: string; icon: string }[] => {
     const menu: { id: AdminSection; label: string; icon: string }[] = [
       { id: 'dashboard', label: 'Dashboard', icon: '📊' },
     ];
 
-    if (isControl) {
+    if (isControl || isDireccion) {
       menu.push(
         { id: 'alumnos', label: 'Alumnos', icon: '👥' },
-        { id: 'expedientes', label: 'Expedientes', icon: '📂' },
-        { id: 'pagos', label: 'Pagos y Colegiaturas', icon: '💳' },
-        { id: 'materias', label: 'Materias', icon: '📖' },
-        { id: 'profesores', label: 'Profesores', icon: '👨‍🏫' },
-        { id: 'sedes', label: 'Sedes', icon: '📍' },
-        { id: 'examenes', label: 'Exámenes', icon: '📝' },
-        { id: 'calificaciones', label: 'Calificaciones', icon: '🎯' },
-        { id: 'documentacion', label: 'Documentación Oficial', icon: '📜' },
-        { id: 'reportes', label: 'Reportes', icon: '📈' },
-        { id: 'alertas', label: 'Alertas', icon: '🔔' },
-        { id: 'auditoria', label: 'Auditorías', icon: '🕵️' },
+        { id: 'documentacion', label: 'Trámites SEP', icon: '🏛️' },
+        { id: 'facturacion', label: 'Facturación CFDI', icon: '🧾' },
+        { id: 'mensajes', label: 'Comunicación', icon: '✉️' },
+        { id: 'auditoria', label: 'Auditoría', icon: '🕵️' },
       );
-      return menu;
-    }
-
-    if (isProfesor) {
+    } else if (isProfesor) {
       menu.push(
-        { id: 'mis_materias', label: 'Mis Materias', icon: '📖' },
-        { id: 'grupos', label: 'Grupos', icon: '👥' },
-        { id: 'contenidos', label: 'Contenidos', icon: '📁' },
-        { id: 'actividades', label: 'Actividades', icon: '✍️' },
-        { id: 'examenes', label: 'Exámenes', icon: '📝' },
-        { id: 'calificaciones', label: 'Calificaciones', icon: '🎯' },
-        { id: 'mensajes', label: 'Mensajes', icon: '✉️' },
-        { id: 'agenda', label: 'Agenda', icon: '📅' },
-        { id: 'reportes', label: 'Reportes', icon: '📈' },
-        { id: 'perfil', label: 'Perfil', icon: '👤' },
+        { id: 'materias', label: 'Mis Materias', icon: '📖' },
+        { id: 'reportes', label: 'Grupos', icon: '👥' },
+        { id: 'dashboard', label: 'Calificaciones', icon: '🎯' },
       );
-      return menu;
     }
-
-    if (isDireccion || isFinanzas) {
-      menu.push(
-        { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-        { id: 'pagos', label: 'Pagos en Línea', icon: '💳' },
-        { id: 'cobranza', label: 'Cobranza Auto.', icon: '🤖' },
-        { id: 'facturacion', label: 'Facturación', icon: '🧾' },
-        { id: 'presupuestos', label: 'Presupuestos', icon: '📉' },
-        { id: 'sedes', label: 'Sedes', icon: '📍' },
-        { id: 'reportes', label: 'Reportes', icon: '📈' },
-        { id: 'auditoria', label: 'Auditorías', icon: '🕵️' },
-        { id: 'configuracion_fin', label: 'Config. Fin.', icon: '⚙️' },
-      );
-      return menu;
-    }
-
     return menu;
   };
 
   const adminMenu = getAdminMenu();
 
   return (
-    <div className="min-h-screen bg-white flex flex-col selection:bg-next-green selection:text-white">
-      <nav className="fixed top-0 left-0 right-0 bg-white border-b border-zinc-100 z-[60]">
-        <div className="max-w-[1600px] mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <button onClick={onHome} className="text-2xl font-black italic tracking-tighter hover:opacity-70 transition-opacity">
+    <div className="min-h-screen bg-white flex flex-col selection:bg-next-green selection:text-white overflow-x-hidden">
+      {/* Navbar Superior */}
+      <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-b border-zinc-100 z-[70]">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-12 h-16 md:h-24 flex items-center justify-between">
+          <div className="flex items-center gap-4 md:gap-12">
+            {isAdminOrStaff && (
+              <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden p-2 text-black"
+                aria-label="Menú"
+              >
+                <div className="w-6 h-0.5 bg-current mb-1.5 rounded-full"></div>
+                <div className="w-4 h-0.5 bg-current mb-1.5 rounded-full"></div>
+                <div className="w-6 h-0.5 bg-current rounded-full"></div>
+              </button>
+            )}
+            <button onClick={onHome} className="text-xl md:text-3xl font-black italic tracking-tighter hover:opacity-70 transition-all uppercase">
               NEXT<span className="text-next-green">.</span>
             </button>
-            <div className="hidden lg:block border-l border-zinc-100 pl-8">
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-300">Bachillerato Ejecutivo</p>
+            <div className="hidden lg:block border-l border-zinc-100 pl-12">
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">Bachillerato Ejecutivo Digital</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 lg:gap-8">
-            {/* Buscador global solo para staff con sesión activa */}
-            {isAdminOrStaff && (
-              <div className="hidden md:flex relative w-48 lg:w-64">
-                <input 
-                  type="text" 
-                  placeholder="Buscar..." 
-                  className="w-full bg-zinc-50 border-none rounded-xl px-10 py-2.5 text-[10px] font-bold focus:ring-1 focus:ring-next-green transition-all"
-                  value={globalSearch}
-                  onChange={(e) => setGlobalSearch(e.target.value)}
-                />
-                <span className="absolute left-3.5 top-2.5 text-zinc-300 text-xs">🔍</span>
-              </div>
-            )}
-
-            {/* Enlaces Rápidos Nav Derecha */}
-            <div className="flex items-center gap-4 md:gap-6">
-              <button 
-                onClick={onSedes}
-                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-next-green transition-all"
-              >
-                <span className="text-sm">📍</span> <span className="hidden sm:inline">Sedes</span>
-              </button>
-
-              {/* Botones de Apartados en la parte superior cuando no hay sesión activa */}
+          <div className="flex items-center gap-3 md:gap-8">
+            <div className="hidden md:flex items-center gap-8 mr-4">
+              <button onClick={onSedes} className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-next-green transition-all">Sedes</button>
               {!activeRole && (
-                <div className="hidden md:flex items-center gap-6 border-l border-zinc-100 pl-6">
-                  <button 
-                    onClick={() => onRoleSelect(Role.ALUMNO)} 
-                    className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-next-green transition-all"
-                  >
-                    Alumnos
-                  </button>
-                  <button 
-                    onClick={() => onRoleSelect(Role.PROFESOR)} 
-                    className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-next-green transition-all"
-                  >
-                    Profesores
-                  </button>
-                  <button 
-                    onClick={() => onRoleSelect(Role.CONTROL_ESCOLAR)} 
-                    className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-next-green transition-all"
-                  >
-                    Control Escolar
-                  </button>
-                </div>
+                <>
+                  <button onClick={() => onRoleSelect(Role.ALUMNO)} className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-next-green transition-all">Alumnos</button>
+                  <button onClick={() => onRoleSelect(Role.PROFESOR)} className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-next-green transition-all">Profesores</button>
+                  <button onClick={() => onRoleSelect(Role.CONTROL_ESCOLAR)} className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-next-green transition-all">Control Escolar</button>
+                </>
               )}
-              
-              <button 
-                onClick={activeRole ? onLogout : () => onRoleSelect(Role.ALUMNO)}
-                className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                  activeRole ? 'bg-zinc-50 text-zinc-400 hover:bg-red-50 hover:text-red-500' : 'bg-next-green text-white shadow-lg shadow-next-green/20 hover:scale-105'
-                }`}
-              >
-                {activeRole ? 'Salir' : 'DIRECCIÓN'}
-              </button>
             </div>
+
+            <button 
+              onClick={activeRole ? onLogout : () => onRoleSelect(Role.DIRECCION)}
+              className={`px-5 md:px-10 py-2.5 md:py-4 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all ${
+                activeRole ? 'bg-zinc-50 text-zinc-500 hover:text-red-500' : 'bg-black text-white shadow-xl hover:bg-next-green'
+              }`}
+            >
+              {activeRole ? 'Salir' : 'DIRECCIÓN'}
+            </button>
           </div>
         </div>
       </nav>
 
-      <div className="flex flex-1 pt-20">
-        {isAdminOrStaff && onAdminSectionChange && (
-          <aside className="w-72 bg-white border-r border-zinc-100 fixed left-0 top-20 bottom-0 overflow-y-auto hidden lg:block z-50">
-            <div className="p-8 space-y-1">
-              <div className="mb-8 px-4 py-4 bg-zinc-50 rounded-2xl border border-zinc-100">
-                <p className="text-[8px] font-black text-zinc-400 uppercase tracking-widest mb-1">Sesión Administrativa</p>
-                <p className="text-xs font-black text-next-green italic truncate">{activeRole?.toUpperCase()}</p>
+      <div className="flex flex-1 pt-16 md:pt-24">
+        {isAdminOrStaff && (
+          <>
+            {isMobileMenuOpen && (
+              <div 
+                className="fixed inset-0 bg-black/50 z-[80] lg:hidden backdrop-blur-sm animate-in fade-in duration-300"
+                onClick={() => setIsMobileMenuOpen(false)}
+              ></div>
+            )}
+            
+            <aside className={`
+              fixed lg:sticky top-16 md:top-24 bottom-0 left-0 w-72 md:w-80 bg-white border-r border-zinc-100 
+              z-[90] lg:z-50 overflow-y-auto transition-all duration-500 ease-in-out
+              ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'}
+            `}>
+              <div className="p-6 md:p-10 space-y-2">
+                <div className="mb-8 md:mb-10 px-6 py-6 bg-zinc-50 rounded-[28px] md:rounded-[32px] border border-zinc-100">
+                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-2">Panel Administrativo</p>
+                  <p className="text-sm font-black text-next-green italic truncate tracking-tighter uppercase">{activeRole?.replace('_', ' ')}</p>
+                </div>
+                {adminMenu.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      onAdminSectionChange?.(item.id);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-4 md:gap-5 px-5 md:px-6 py-3.5 md:py-4 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-[0.15em] transition-all group ${
+                      currentAdminSection === item.id || (currentAdminSection === 'expedientes' && item.id === 'alumnos')
+                        ? 'bg-next-green text-white shadow-xl shadow-next-green/20' 
+                        : 'text-zinc-500 hover:text-black hover:bg-zinc-50'
+                    }`}
+                  >
+                    <span className="text-xl group-hover:scale-125 transition-transform">{item.icon}</span>
+                    {item.label}
+                  </button>
+                ))}
               </div>
-              {adminMenu.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => onAdminSectionChange(item.id)}
-                  className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                    currentAdminSection === item.id 
-                      ? 'bg-next-green text-white shadow-lg shadow-next-green/20' 
-                      : 'text-zinc-400 hover:text-next-black hover:bg-zinc-50'
-                  }`}
-                >
-                  <span className="text-lg">{item.icon}</span>
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </aside>
+            </aside>
+          </>
         )}
 
-        <main className={`flex-1 ${isAdminOrStaff ? 'lg:ml-72' : ''} min-h-screen bg-white`}>
-          <div className={`${activeRole || currentAdminSection === 'sedes' ? 'p-8 lg:p-12 max-w-[1400px] mx-auto' : ''}`}>
+        <main className={`flex-1 min-h-screen bg-white transition-all`}>
+          <div className={`${activeRole || currentAdminSection === 'sedes' ? 'p-4 sm:p-8 md:p-16 max-w-[1600px] mx-auto' : ''}`}>
             {children}
           </div>
         </main>
