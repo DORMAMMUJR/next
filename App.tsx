@@ -137,46 +137,19 @@ const App: React.FC = () => {
 
   // Cargar datos
   useEffect(() => {
-    // Si queremos datos reales, pedimos a la API
-    // Usamos headers Accept application/json para evitar problemas con proxies de vite que devuelven HTML
-    fetch('/api/alumnos', { headers: { 'Accept': 'application/json' } })
-      .then(async (res) => {
-        const contentType = res.headers.get("content-type");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        if (!contentType || !contentType.includes("application/json")) {
-           // Si no es JSON (ej. es el HTML de fallback), tratamos como "sin datos" pero no error crítico
-           return []; 
-        }
-        return res.json();
-      })
-      .then(alumnosReales => {
-        if (Array.isArray(alumnosReales) && alumnosReales.length > 0) {
-           console.log("✅ Conectado a DB:", alumnosReales.length, "registros");
-           setData(prev => ({ 
-             ...prev, 
-             alumnos: alumnosReales,
-             // Mantenemos datos dummy para lo que no venga de DB
-             docentes: prev.docentes.length ? prev.docentes : SEED_AGUASCALIENTES.docentes,
-             pagos: prev.pagos.length ? prev.pagos : SEED_AGUASCALIENTES.pagos 
-           }));
-        } else {
-           // DB vacía o no conectada (retornó []), usar fallback silenciosamente
-           throw new Error("Empty or offline");
+    // Pedimos a la base de datos real
+    fetch('/api/alumnos')
+      .then(res => res.json())
+      .then(dataDB => {
+        // Si la DB responde, usamos esos datos
+        if (Array.isArray(dataDB)) {
+            setData(prev => ({ ...prev, alumnos: dataDB }));
         }
       })
       .catch(err => {
-        // Fallback a localStorage o Seed
-        // No usamos console.error para no alarmar si es el comportamiento offline esperado
-        if (err.message !== "Empty or offline") {
-           console.warn("Modo Offline activo:", err.message);
-        }
-        
-        const saved = localStorage.getItem(`NEXT_DATA_${currentSlug}`);
-        if (saved) {
-           setData(JSON.parse(saved));
-        } else if (currentSlug === 'aguascalientes') {
-           saveData(SEED_AGUASCALIENTES);
-        }
+        console.log("Usando datos locales por error:", err);
+        // Solo si falla, usamos el backup local
+        if (currentSlug === 'aguascalientes') saveData(SEED_AGUASCALIENTES);
       });
   }, [currentSlug]);
 
