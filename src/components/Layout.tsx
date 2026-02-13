@@ -5,7 +5,7 @@ import Navbar from './Navbar';
 
 interface LayoutProps {
   children: React.ReactNode;
-  activeRole: Role | null;
+
   activeSede: string;
   onSedeSelect: (sede: string) => void;
   onLogout: () => void;
@@ -22,7 +22,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({
-  children, activeRole, activeSede, onSedeSelect, onLogout,
+  children, activeSede, onSedeSelect, onLogout,
   currentView, onNavigate, searchData // Desestructuramos searchData
 }) => {
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Role, AdminSection, CityData, AppView } from './types';
+import { Role, CityData, AppView } from './types';
 import { MessageCircleQuestion } from 'lucide-react'; // Icono para el botón
 import LandingPage from './components/LandingPage';
 import Layout from './components/Layout';
@@ -254,7 +254,7 @@ const App: React.FC = () => {
     <>
       {/* 4. ACTUALIZA EL LAYOUT PARA PASARLE LA NAVEGACIÓN */}
       <Layout
-        activeRole={activeRole}
+
         activeSede={activeSede}
         onSedeSelect={(sede) => setActiveSede(sede)}
         onLogout={() => setShowLogin(true)}

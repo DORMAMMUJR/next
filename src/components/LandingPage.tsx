@@ -103,16 +103,19 @@ const LandingPage: React.FC<LandingProps> = ({ onLogin, onGoToUpload }) => {
                     </div>
                   </button>
 
-                  <div className="pt-4 border-t border-zinc-100">
-                    <p className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest mb-3 text-center">Zona de Alumnos</p>
-                    <button
-                      onClick={onGoToUpload}
-                      className="group w-full bg-white border-2 border-zinc-100 p-4 rounded-xl flex items-center justify-center gap-3 transition-all hover:border-black hover:shadow-lg hover:scale-[1.02]"
-                    >
-                      <span className="font-bold text-xs uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">Alumnos</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400 group-hover:text-black"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>
-                    </button>
-                  </div>
+                  <button
+                    onClick={onGoToUpload}
+                    className="group w-full bg-white border border-zinc-200 p-8 rounded-[2rem] flex items-center justify-between transition-all hover:shadow-2xl hover:scale-[1.02] hover:border-zinc-300 relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-green-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="text-left relative z-10">
+                      <span className="font-bold text-xs uppercase tracking-widest text-zinc-500 group-hover:text-green-600 block mb-2 transition-colors">Portal</span>
+                      <span className="text-4xl font-black text-zinc-900">Alumnos</span>
+                    </div>
+                    <div className="w-14 h-14 bg-zinc-50 rounded-full flex items-center justify-center group-hover:bg-green-500 group-hover:text-white transition-all shadow-sm group-hover:shadow-green-200">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                    </div>
+                  </button>
                 </motion.div>
               ) : (
                 <motion.form
