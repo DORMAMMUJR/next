@@ -2,24 +2,25 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Configuración de __dirname para ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-// Seenode (y otros hostings) inyectan el puerto en process.env.PORT
-const PORT = process.env.PORT || 3000;
 
-// 1. Servir los archivos estáticos generados por Vite (carpeta dist)
+// --- CORRECCIÓN CRÍTICA ---
+// 1. Usamos el puerto que Seenode nos da en process.env.PORT
+// 2. Si no hay, usamos el 80 (que es el default en Seenode)
+const PORT = process.env.PORT || 80;
+
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// 2. Manejo de SPA (Single Page Application)
-// Cualquier petición que no coincida con un archivo estático (JS, CSS, Imágenes)
-// se redirige al index.html para que React Router maneje la ruta en el cliente.
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor de producción Next corriendo en puerto ${PORT}`);
+// --- CORRECCIÓN CRÍTICA 2 ---
+// Escuchar en '0.0.0.0' es OBLIGATORIO para Docker/Seenode
+// Si solo pones app.listen(PORT), a veces se queda en localhost y falla
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Servidor Next corriendo en puerto ${PORT}`);
 });
