@@ -1,43 +1,48 @@
 import React from 'react';
 
-const Footer: React.FC = () => {
+const Footer = () => {
   return (
-    <footer className="bg-black text-white pt-16 pb-8 border-t border-zinc-900 mt-auto w-full">
-      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-12 mb-12">
-        <div>
-          <h4 className="text-2xl font-black italic mb-4 text-white">NEXT<span className="text-next-green">.</span></h4>
-          <p className="text-xs text-zinc-300 font-medium leading-relaxed">
-            Plataforma educativa de alto rendimiento. Bachillerato ejecutivo digital con validez oficial RVOE 2026.
+    <footer className="w-full bg-black text-white py-12 px-6 mt-auto animate-in slide-in-from-bottom-10 duration-700">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-zinc-800 pb-12">
+
+        {/* Columna 1: Marca */}
+        <div className="col-span-1 md:col-span-2 space-y-4">
+          <h2 className="text-3xl font-black italic tracking-tighter">NEXT<span className="text-next-green">.</span></h2>
+          <p className="text-zinc-500 text-sm max-w-xs leading-relaxed">
+            Plataforma integral de gestión académica. Control de pagos, auditoría y seguimiento docente en tiempo real.
           </p>
-        </div>
-        <div>
-          <h5 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-4">Contacto</h5>
-          <p className="text-xs text-zinc-300 mb-2">Av. Universidad 1001, Aguascalientes, Ags.</p>
-          <p className="text-xs text-zinc-300 mb-2">contacto@next-edu.mx</p>
-          <div className="flex gap-4 mt-4">
-            <span className="w-8 h-8 bg-zinc-800 rounded-full flex items-center justify-center text-xs text-white hover:bg-next-green hover:text-black transition-colors cursor-pointer border border-zinc-700">FB</span>
-            <span className="w-8 h-8 bg-zinc-800 rounded-full flex items-center justify-center text-xs text-white hover:bg-next-green hover:text-black transition-colors cursor-pointer border border-zinc-700">IG</span>
-            <span className="w-8 h-8 bg-zinc-800 rounded-full flex items-center justify-center text-xs text-white hover:bg-next-green hover:text-black transition-colors cursor-pointer border border-zinc-700">X</span>
+          <div className="flex gap-4 pt-4">
+            {/* Redes Sociales (Simuladas con texto estilizado o iconos) */}
+            <a href="#" className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-white hover:text-black transition-all">FB</a>
+            <a href="#" className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-white hover:text-black transition-all">IG</a>
+            <a href="#" className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-white hover:text-black transition-all">X</a>
           </div>
         </div>
-        <div>
-          <h5 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-4">Legal</h5>
-          <ul className="space-y-2 text-xs text-zinc-300">
-            <li className="hover:text-white cursor-pointer">Aviso de Privacidad</li>
-            <li className="hover:text-white cursor-pointer">Términos y Condiciones</li>
-            <li className="hover:text-white cursor-pointer">Reglamento Escolar</li>
+
+        {/* Columna 2: Enlaces */}
+        <div className="space-y-4">
+          <h4 className="text-xs font-black uppercase tracking-widest text-zinc-500">Plataforma</h4>
+          <ul className="space-y-2 text-sm text-zinc-400">
+            <li><a href="#" className="hover:text-white transition-colors">Soporte Técnico</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">Manual de Usuario</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">Reportar Fallo</a></li>
+          </ul>
+        </div>
+
+        {/* Columna 3: Legal */}
+        <div className="space-y-4">
+          <h4 className="text-xs font-black uppercase tracking-widest text-zinc-500">Legal</h4>
+          <ul className="space-y-2 text-sm text-zinc-400">
+            <li><a href="#" className="hover:text-white transition-colors">Privacidad</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">Términos de Uso</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">Falla Intecnia © 2026</a></li>
           </ul>
         </div>
       </div>
-      <div className="border-t border-zinc-900 pt-8 text-center">
-        <a 
-          href="https://intecnia-final.vercel.app/" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-next-green transition-colors"
-        >
-          BY INTECNIA
-        </a>
+
+      <div className="max-w-6xl mx-auto pt-8 flex flex-col md:flex-row justify-between items-center text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
+        <p>System Status: <span className="text-green-500">● Operational</span></p>
+        <p>Designed by Falla Intecnia</p>
       </div>
     </footer>
   );
