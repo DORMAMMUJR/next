@@ -291,7 +291,7 @@ const App: React.FC = () => {
 
     const updatedAlumnos = data.alumnos.map(a => {
       if (a.id === alumnoId) {
-        return { ...a, financial_status: newStatus };
+        return { ...a, financial_status: newStatus as 'CLEAN' | 'DEBT' };
       }
       return a;
     });
