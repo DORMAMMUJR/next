@@ -59,7 +59,7 @@ const LandingPage: React.FC<LandingProps> = ({ onLogin, onGoToUpload }) => {
             <h1 className="text-8xl md:text-9xl font-black italic tracking-tighter text-zinc-900 leading-[0.85]">
               NEXT<span className="text-green-500">.</span>
             </h1>
-            <p className="text-xl md:text-2xl font-medium text-zinc-500 max-w-lg leading-relaxed">
+            <p className="text-xl md:text-2xl font-medium text-zinc-600 max-w-lg leading-relaxed">
               La evolución del control escolar. Gestión administrativa y docente centralizada en una sola plataforma segura.
             </p>
           </motion.div>
@@ -82,7 +82,7 @@ const LandingPage: React.FC<LandingProps> = ({ onLogin, onGoToUpload }) => {
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-green-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="text-left relative z-10">
-                      <span className="font-bold text-xs uppercase tracking-widest text-zinc-400 group-hover:text-green-600 block mb-2 transition-colors">Acceso</span>
+                      <span className="font-bold text-xs uppercase tracking-widest text-zinc-500 group-hover:text-green-600 block mb-2 transition-colors">Acceso</span>
                       <span className="text-4xl font-black text-zinc-900">Docentes</span>
                     </div>
                     <div className="w-14 h-14 bg-zinc-50 rounded-full flex items-center justify-center group-hover:bg-green-500 group-hover:text-white transition-all shadow-sm group-hover:shadow-green-200">
@@ -122,7 +122,7 @@ const LandingPage: React.FC<LandingProps> = ({ onLogin, onGoToUpload }) => {
                   </button>
 
                   <div className="mb-2">
-                    <span className="text-xs font-bold uppercase tracking-widest text-zinc-400 block mb-2">
+                    <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 block mb-2">
                       {selectedRole === Role.OWNER ? 'Portal Administrativo' : 'Portal Docente'}
                     </span>
                     <h2 className="text-3xl font-black italic text-zinc-900">Iniciar Sesión</h2>
@@ -141,7 +141,7 @@ const LandingPage: React.FC<LandingProps> = ({ onLogin, onGoToUpload }) => {
                       />
                       <label
                         htmlFor="identifier"
-                        className="absolute left-5 top-5 text-zinc-400 text-xs font-bold uppercase tracking-widest transition-all peer-placeholder-shown:top-6 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-zinc-900"
+                        className="absolute left-5 top-5 text-zinc-500 text-xs font-bold uppercase tracking-widest transition-all peer-placeholder-shown:top-6 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-zinc-900"
                       >
                         Identificador
                       </label>
@@ -158,7 +158,7 @@ const LandingPage: React.FC<LandingProps> = ({ onLogin, onGoToUpload }) => {
                       />
                       <label
                         htmlFor="password"
-                        className="absolute left-5 top-5 text-zinc-400 text-xs font-bold uppercase tracking-widest transition-all peer-placeholder-shown:top-6 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-zinc-900"
+                        className="absolute left-5 top-5 text-zinc-500 text-xs font-bold uppercase tracking-widest transition-all peer-placeholder-shown:top-6 peer-placeholder-shown:text-sm peer-focus:top-2 peer-focus:text-[10px] peer-focus:text-zinc-900"
                       >
                         Clave de Acceso
                       </label>

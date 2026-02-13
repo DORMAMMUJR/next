@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Role, AdminSection, CityData, AppView } from './types';
+import { MessageCircleQuestion } from 'lucide-react'; // Icono para el botón
 import LandingPage from './components/LandingPage';
 import Layout from './components/Layout';
 import OwnerDashboard from './components/OwnerDashboard';
@@ -9,10 +10,12 @@ import Toast from './components/Toast';
 import TeachersView from './components/TeachersView';
 import SettingsView from './components/SettingsView';
 import StudentUpload from './components/StudentUpload';
+import SupportModal from './components/SupportModal';
 
 const App: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
   const [activeRole, setActiveRole] = useState<Role | null>(null);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
 
   // 2. NUEVO ESTADO PARA CONTROLAR LA NAVEGACIÓN:
   const [currentView, setCurrentView] = useState<AppView>('dashboard');
@@ -20,10 +23,47 @@ const App: React.FC = () => {
   // NUEVO: Estado para la Sede Activa
   const [activeSede, setActiveSede] = useState<string>('GENERAL');
 
+  // --- GENERADOR DE DATOS DE PRUEBA ---
+  const generateDummyData = (): CityData => {
+    const sedes = ['aguascalientes', 'cdmx', 'monterrey', 'guadalajara', 'queretaro', 'cancun'];
+    const docentesNombres = ['Roberto Gómez', 'Laura Pausini', 'Carlos Santana', 'Frida Kahlo', 'Pedro Infante', 'Selena Quintanilla'];
+
+    let docentes: any[] = [];
+    let alumnos: any[] = [];
+
+    // Creamos 2 o 3 maestros por sede
+    sedes.forEach((sede) => {
+      // 3 Maestros por sede
+      for (let i = 0; i < 3; i++) {
+        const docId = `doc-${sede}-${i}`;
+        docentes.push({
+          id: docId,
+          nombre_completo: `Prof. ${docentesNombres[i] || 'Docente'} (${sede.substring(0, 3).toUpperCase()})`,
+          sede_slug: sede,
+          email: `docente${i}@${sede}.com`
+        });
+
+        // Creamos 5 a 10 alumnos por maestro
+        const numAlumnos = Math.floor(Math.random() * 5) + 5;
+        for (let j = 0; j < numAlumnos; j++) {
+          alumnos.push({
+            id: `alum-${sede}-${i}-${j}`,
+            nombre_completo: `Alumno ${j + 1} de ${sede}`,
+            matricula: `${sede.substring(0, 3).toUpperCase()}-2026-${i}${j}`,
+            docente_id: docId,
+            financial_status: Math.random() > 0.3 ? 'CLEAN' : 'DEBT', // 30% deudores
+            sede: sede
+          });
+        }
+      }
+    });
+
+    return { alumnos, docentes, matriculas: [], pagos: [], expedientes: [] };
+  };
+
   // ESTADO DE DATOS (BD)
-  const [data, setData] = useState<CityData>({
-    alumnos: [], matriculas: [], pagos: [], expedientes: [], docentes: []
-  });
+  // CAMBIA EL STATE INICIAL PARA USAR LOS DATOS FALSOS:
+  const [data, setData] = useState<CityData>(generateDummyData());
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   // ESTADO MODAL (Agregar Alumno)
@@ -220,10 +260,27 @@ const App: React.FC = () => {
         onLogout={() => setShowLogin(true)}
         currentView={currentView} // <-- NUEVO
         onNavigate={setCurrentView} // <-- NUEVO: Le pasamos la función para cambiar la vista
+        searchData={data}
       >
         {/* 5. RENDERIZA EL CONTENIDO DINÁMICO */}
         {renderContent()}
+
+        {/* BOTÓN FLOTANTE DE SOPORTE (Esquina inferior derecha) */}
+        <button
+          onClick={() => setIsSupportOpen(true)}
+          className="fixed bottom-6 right-6 bg-black text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform z-40 group"
+          title="Ayuda y Soporte"
+        >
+          <MessageCircleQuestion size={24} />
+          {/* Tooltip */}
+          <span className="absolute right-full mr-3 top-2 bg-white text-black text-xs font-bold px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-sm pointer-events-none">
+            ¿Necesitas ayuda?
+          </span>
+        </button>
       </Layout>
+
+      {/* MODALES GLOBALES */}
+      <SupportModal isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} />
 
       <NewStudentModal
         isOpen={isAddModalOpen}

@@ -6,3 +6,43 @@ body {
     background-color: #ffffff;
     font-family: 'Inter', sans-serif;
 }
+
+.font-mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Reglas para mejorar la legibilidad */
+.text-readable-secondary {
+    @apply text-zinc-600 font-medium;
+    /* Gris oscuro y con peso medio */
+}
+
+.text-readable-title {
+    @apply text-zinc-900 font-black tracking-tight;
+    /* Negro sólido */
+}
+
+/* Hacemos los inputs más legibles */
+input,
+select,
+textarea {
+    @apply text-zinc-900 font-bold placeholder:text-zinc-400;
+}
+
+/* Scrollbar elegante */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #e4e4e7;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a1a1aa;
+}

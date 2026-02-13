@@ -53,14 +53,14 @@ const StudentUpload: React.FC<StudentUploadProps> = ({ onBack, onUpload }) => {
 
             <div className="w-full max-w-md space-y-8 animate-in slide-in-from-bottom-10">
                 <div className="text-center">
-                    <h1 className="text-4xl font-black italic uppercase tracking-tighter">Subir Pago<span className="text-green-500">.</span></h1>
-                    <p className="text-zinc-400 font-bold uppercase tracking-widest text-xs mt-2">Sube tu ticket o captura de transferencia</p>
+                    <h1 className="text-4xl font-black italic uppercase tracking-tighter text-zinc-900">Subir Pago<span className="text-green-500">.</span></h1>
+                    <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs mt-2">Sube tu ticket o captura de transferencia</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Input Matrícula */}
                     <div className="space-y-2">
-                        <label className="text-xs font-black uppercase text-zinc-400 ml-1">Tu Matrícula</label>
+                        <label className="text-xs font-black uppercase text-zinc-500 ml-1">Tu Matrícula</label>
                         <div className="relative">
                             <Search className="absolute left-4 top-4 text-zinc-300" size={20} />
                             <input
@@ -68,7 +68,7 @@ const StudentUpload: React.FC<StudentUploadProps> = ({ onBack, onUpload }) => {
                                 type="text"
                                 value={matricula}
                                 onChange={(e) => setMatricula(e.target.value.toUpperCase())}
-                                className="w-full bg-zinc-50 border-2 border-zinc-100 focus:border-black rounded-2xl py-4 pl-12 pr-4 font-mono text-lg font-bold uppercase outline-none transition-colors"
+                                className="w-full bg-zinc-50 border-2 border-zinc-100 focus:border-black rounded-2xl py-4 pl-12 pr-4 font-mono text-lg font-bold uppercase outline-none transition-colors placeholder:text-zinc-400"
                                 placeholder="EJ: AGS-2026-001"
                             />
                         </div>
@@ -76,7 +76,7 @@ const StudentUpload: React.FC<StudentUploadProps> = ({ onBack, onUpload }) => {
 
                     {/* Input Archivo (Drag & Drop visual) */}
                     <div className="space-y-2">
-                        <label className="text-xs font-black uppercase text-zinc-400 ml-1">Comprobante</label>
+                        <label className="text-xs font-black uppercase text-zinc-500 ml-1">Comprobante</label>
                         <label className="relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-zinc-300 rounded-2xl cursor-pointer hover:bg-zinc-50 hover:border-black transition-all group overflow-hidden">
                             {file ? (
                                 <div className="text-center p-4">
@@ -84,13 +84,13 @@ const StudentUpload: React.FC<StudentUploadProps> = ({ onBack, onUpload }) => {
                                         <CheckCircle size={24} />
                                     </div>
                                     <p className="font-bold text-sm text-zinc-800 break-all">{file.name}</p>
-                                    <p className="text-[10px] uppercase font-bold text-zinc-400 mt-1">Clic para cambiar</p>
+                                    <p className="text-[10px] uppercase font-bold text-zinc-500 mt-1">Clic para cambiar</p>
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                     <Upload className="w-10 h-10 mb-3 text-zinc-300 group-hover:text-black transition-colors" />
-                                    <p className="mb-2 text-sm text-zinc-500 font-bold"><span className="text-black">Toca aquí</span> para subir foto</p>
-                                    <p className="text-xs text-zinc-400">PNG, JPG o PDF</p>
+                                    <p className="mb-2 text-sm text-zinc-600 font-bold"><span className="text-black">Toca aquí</span> para subir foto</p>
+                                    <p className="text-xs text-zinc-500">PNG, JPG o PDF</p>
                                 </div>
                             )}
                             <input
