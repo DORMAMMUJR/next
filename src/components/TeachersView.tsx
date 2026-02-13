@@ -32,7 +32,7 @@ const TeachersView: React.FC<TeachersViewProps> = ({ docentes, alumnos, onOpenAd
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 className="text-3xl font-black italic uppercase text-zinc-900">Directorio de Docentes</h2>
+                    <h2 className="text-3xl font-black italic uppercase text-zinc-900 dark:text-white">Directorio de Docentes</h2>
                     <p className="text-zinc-500 font-medium">Gestiona y contacta al equipo académico.</p>
                 </div>
 
@@ -66,7 +66,7 @@ const TeachersView: React.FC<TeachersViewProps> = ({ docentes, alumnos, onOpenAd
                     const gender = index % 2 === 0 ? 'men' : 'women';
 
                     return (
-                        <div key={docente.id} className="bg-white rounded-3xl p-6 border border-zinc-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                        <div key={docente.id} className="bg-white dark:bg-zinc-900 dark:border-zinc-800 rounded-3xl p-6 border border-zinc-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
                             <div className="flex items-start justify-between mb-6">
                                 <div className="flex items-center gap-4">
                                     <div className="relative">
@@ -80,7 +80,7 @@ const TeachersView: React.FC<TeachersViewProps> = ({ docentes, alumnos, onOpenAd
                                         </div>
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg text-zinc-900 leading-tight">{docente.nombre_completo}</h3>
+                                        <h3 className="font-bold text-lg text-zinc-900 dark:text-white leading-tight">{docente.nombre_completo}</h3>
                                         <span className="inline-block mt-1 px-2 py-0.5 bg-zinc-100 text-zinc-600 text-[10px] font-black uppercase tracking-wider rounded-md">
                                             {docente.sede_slug}
                                         </span>
@@ -94,7 +94,7 @@ const TeachersView: React.FC<TeachersViewProps> = ({ docentes, alumnos, onOpenAd
                                         <Users size={16} />
                                         <span>Alumnos</span>
                                     </div>
-                                    <span className="font-bold text-zinc-900">{getStudentCount(docente.id)}</span>
+                                    <span className="font-bold text-zinc-900 dark:text-white">{getStudentCount(docente.id)}</span>
                                 </div>
                             </div>
 

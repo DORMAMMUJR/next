@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { MapPin, ChevronDown, Bell, Search, X, User } from 'lucide-react';
+import { MapPin, ChevronDown, Bell, Search, X, User, Moon, Sun } from 'lucide-react';
 import { CITIES } from '../constants';
 
 interface NavbarProps {
   activeSede: string;
   onSedeSelect: (sede: string) => void;
-  // Pasamos los datos para poder buscar en ellos
   searchData?: { alumnos: any[], docentes: any[] };
-  // NUEVO: Sedes disponibles
   availableSedes?: string[];
+  theme: string;
+  toggleTheme: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ activeSede, onSedeSelect, searchData, availableSedes = [] }) => {
+const Navbar: React.FC<NavbarProps> = ({ activeSede, onSedeSelect, searchData, availableSedes = [], theme, toggleTheme }) => {
   const [isSedeOpen, setIsSedeOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -36,7 +36,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeSede, onSedeSelect, searchData, a
 
   return (
     <>
-      <div className="h-20 bg-white border-b border-zinc-200 px-8 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+      <div className="h-20 bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 px-8 flex items-center justify-between sticky top-0 z-30 shadow-sm transition-colors duration-300">
 
         {/* SELECTOR DE SEDE (Igual que antes pero con texto más oscuro) */}
         <div className="relative">
@@ -78,6 +78,15 @@ const Navbar: React.FC<NavbarProps> = ({ activeSede, onSedeSelect, searchData, a
 
         {/* --- ÁREA DERECHA: BUSCADOR Y NOTIFICACIONES --- */}
         <div className="flex items-center gap-4">
+
+          {/* 0. TOGGLE TEMA */}
+          <button
+            onClick={toggleTheme}
+            className="p-3 text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-all"
+            title={theme === 'dark' ? "Cambiar a Modo Claro" : "Cambiar a Modo Oscuro"}
+          >
+            {theme === 'dark' ? <Sun size={22} strokeWidth={2.5} /> : <Moon size={22} strokeWidth={2.5} />}
+          </button>
 
           {/* 1. BOTÓN DE BÚSQUEDA */}
           <button

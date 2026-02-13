@@ -4,12 +4,13 @@ import { Settings, User, Building2, Bell, Shield, Smartphone, Plus, Trash2 } fro
 interface SettingsViewProps {
     availableSedes?: string[];
     onAddSede?: (sede: string) => void;
+    theme?: string;
+    toggleTheme?: () => void;
 }
 
-const SettingsView: React.FC<SettingsViewProps> = ({ availableSedes = [], onAddSede }) => {
+const SettingsView: React.FC<SettingsViewProps> = ({ availableSedes = [], onAddSede, theme, toggleTheme }) => {
     const [newSedeName, setNewSedeName] = useState('');
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-    const [darkModeEnabled, setDarkModeEnabled] = useState(false);
 
     const handleAddSede = (e: React.FormEvent) => {
         e.preventDefault();
@@ -25,17 +26,17 @@ const SettingsView: React.FC<SettingsViewProps> = ({ availableSedes = [], onAddS
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500 pb-20">
             <div>
-                <h2 className="text-3xl font-black italic uppercase text-zinc-900">Ajustes</h2>
+                <h2 className="text-3xl font-black italic uppercase text-zinc-900 dark:text-white">Ajustes</h2>
                 <p className="text-zinc-500 font-medium">Configura tu perfil, gestiona las sedes y preferencias.</p>
             </div>
 
             {/* SECCIÓN 1: MI PERFIL */}
-            <section className="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
+            <section className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-3xl p-8 shadow-sm border border-zinc-100">
                 <div className="flex items-center gap-4 mb-6">
                     <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
                         <User size={24} />
                     </div>
-                    <h3 className="text-xl font-bold text-zinc-900">Mi Perfil</h3>
+                    <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Mi Perfil</h3>
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
@@ -63,13 +64,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({ availableSedes = [], onAddS
             </section>
 
             {/* SECCIÓN 2: GESTIÓN DE SEDES */}
-            <section className="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
+            <section className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-3xl p-8 shadow-sm border border-zinc-100">
                 <div className="flex items-center gap-4 mb-6">
                     <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
                         <Building2 size={24} />
                     </div>
                     <div>
-                        <h3 className="text-xl font-bold text-zinc-900">Gestión de Sedes</h3>
+                        <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Gestión de Sedes</h3>
                         <p className="text-sm text-zinc-500">Agrega nuevas sedes para organizar tu institución.</p>
                     </div>
                 </div>
@@ -114,12 +115,12 @@ const SettingsView: React.FC<SettingsViewProps> = ({ availableSedes = [], onAddS
             </section>
 
             {/* SECCIÓN 3: PREFERENCIAS DEL SISTEMA */}
-            <section className="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
+            <section className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 rounded-3xl p-8 shadow-sm border border-zinc-100">
                 <div className="flex items-center gap-4 mb-6">
                     <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
                         <Settings size={24} />
                     </div>
-                    <h3 className="text-xl font-bold text-zinc-900">Preferencias del Sistema</h3>
+                    <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Preferencias del Sistema</h3>
                 </div>
 
                 <div className="space-y-4">
@@ -145,12 +146,17 @@ const SettingsView: React.FC<SettingsViewProps> = ({ availableSedes = [], onAddS
                                 <Shield size={20} />
                             </div>
                             <div>
-                                <h4 className="font-bold text-zinc-900">Modo Oscuro</h4>
+                                <h4 className="font-bold text-zinc-900 dark:text-white">Modo Oscuro</h4>
                                 <p className="text-xs text-zinc-500">Interfaz oscura para reducir fatiga visual.</p>
                             </div>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" checked={darkModeEnabled} onChange={() => setDarkModeEnabled(!darkModeEnabled)} className="sr-only peer" />
+                            <input
+                                type="checkbox"
+                                checked={theme === 'dark'}
+                                onChange={toggleTheme}
+                                className="sr-only peer"
+                            />
                             <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-zinc-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-zinc-900"></div>
                         </label>
                     </div>

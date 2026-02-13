@@ -19,6 +19,28 @@ const App: React.FC = () => {
   const [activeRole, setActiveRole] = useState<Role | null>(null);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
 
+  // TEMA (OSCURO/CLARO)
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme') || 'light';
+    }
+    return 'light';
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
   // 2. NUEVO ESTADO PARA CONTROLAR LA NAVEGACIÓN:
   const [currentView, setCurrentView] = useState<AppView>('dashboard');
 
@@ -224,6 +246,8 @@ const App: React.FC = () => {
           <SettingsView
             availableSedes={availableSedes}
             onAddSede={(newSede) => setAvailableSedes([...availableSedes, newSede])}
+            theme={theme}
+            toggleTheme={toggleTheme}
           />
         );
       default:
@@ -281,7 +305,9 @@ const App: React.FC = () => {
         currentView={currentView} // <-- NUEVO
         onNavigate={setCurrentView} // <-- NUEVO: Le pasamos la función para cambiar la vista
         searchData={data}
-        availableSedes={availableSedes} // <-- NUEVO: Pasamos las sedes dinámicas al Layout
+        availableSedes={availableSedes}
+        theme={theme}
+        toggleTheme={toggleTheme}
       >
         {/* 5. RENDERIZA EL CONTENIDO DINÁMICO */}
         {renderContent()}

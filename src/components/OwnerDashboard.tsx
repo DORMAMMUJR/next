@@ -77,7 +77,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
             {/* 1. Encabezado */}
             <div className="flex flex-col md:flex-row justify-between items-end gap-6">
                 <div>
-                    <span className="text-[10px] font-black uppercase text-zinc-600 tracking-widest bg-zinc-100 px-3 py-1 rounded-full">
+                    <span className="text-[10px] font-black uppercase text-zinc-600 dark:text-zinc-400 tracking-widest bg-zinc-100 px-3 py-1 rounded-full">
                         Sede: {sedeName}
                     </span>
                     <h2 className="text-4xl mt-4 font-black italic uppercase tracking-tighter">
@@ -124,7 +124,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                     </div>
 
                     {/* Columna 3: ALERTA DE FUGA (Lo que falta) */}
-                    <div className="bg-white/10 p-4 rounded-2xl border border-white/10 backdrop-blur-md">
+                    <div className="dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100/10 p-4 rounded-2xl border border-white/10 backdrop-blur-md">
                         <div className="flex items-center gap-2 mb-1">
                             <AlertTriangle className="text-yellow-400" size={16} />
                             <p className="text-yellow-400 text-[9px] font-black uppercase tracking-widest">Faltante / Posible Fuga</p>
@@ -140,11 +140,11 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
             {/* --- SECCIÓN DE LISTAS POR DOCENTE --- */}
             <div className="space-y-6">
                 <h3 className="text-2xl font-black italic uppercase tracking-tighter">
-                    Nómina Académica <span className="text-zinc-600 text-sm not-italic font-bold">({sedeName})</span>
+                    Nómina Académica <span className="text-zinc-600 dark:text-zinc-400 text-sm not-italic font-bold">({sedeName})</span>
                 </h3>
 
                 {docentesDeSede.length === 0 ? (
-                    <div className="p-10 text-center text-zinc-600 border border-dashed border-zinc-300 rounded-xl">
+                    <div className="p-10 text-center text-zinc-600 dark:text-zinc-400 border border-dashed border-zinc-300 rounded-xl">
                         No hay docentes registrados en esta sede.
                     </div>
                 ) : (
@@ -155,12 +155,12 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                         const isExpanded = expandedDocentes.includes(docente.id);
 
                         return (
-                            <div key={docente.id} className="bg-white border border-zinc-200 rounded-2xl overflow-hidden shadow-sm transition-all hover:shadow-md">
+                            <div key={docente.id} className="dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100 border border-zinc-200 rounded-2xl overflow-hidden shadow-sm transition-all hover:shadow-md">
 
                                 {/* 1. ENCABEZADO DEL MAESTRO (Clickeable) */}
                                 <button
                                     onClick={() => toggleDocente(docente.id)}
-                                    className="w-full flex items-center justify-between p-6 bg-white hover:bg-zinc-50 transition-colors"
+                                    className="w-full flex items-center justify-between p-6 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100 hover:bg-zinc-50 transition-colors"
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className={`p-2 rounded-full transition-colors ${isExpanded ? 'bg-black text-white' : 'bg-zinc-100 text-zinc-500'}`}>
@@ -168,7 +168,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                                         </div>
                                         <div className="text-left">
                                             <p className="font-black text-lg text-zinc-800 uppercase italic">{docente.nombre_completo}</p>
-                                            <p className="text-xs font-bold text-zinc-600 uppercase tracking-widest">
+                                            <p className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest">
                                                 <span className="font-mono text-black">{misAlumnos.length}</span> Alumnos asignados
                                             </p>
                                         </div>
@@ -182,7 +182,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                                             </span>
                                         )}
                                         <div className="w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center">
-                                            <User size={20} className="text-zinc-600" />
+                                            <User size={20} className="text-zinc-600 dark:text-zinc-400" />
                                         </div>
                                     </div>
                                 </button>
@@ -202,9 +202,9 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                                                 </thead>
                                                 <tbody className="divide-y divide-zinc-200/50 text-sm">
                                                     {misAlumnos.map(alumno => (
-                                                        <tr key={alumno.id} className="hover:bg-white transition-colors">
+                                                        <tr key={alumno.id} className="hover:dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100 transition-colors">
                                                             <td className="p-4 pl-6 font-bold text-zinc-700">{alumno.nombre_completo}</td>
-                                                            <td className="p-4 font-mono text-xs text-zinc-600">{alumno.matricula}</td>
+                                                            <td className="p-4 font-mono text-xs text-zinc-600 dark:text-zinc-400">{alumno.matricula}</td>
                                                             <td className="p-4 text-center">
                                                                 {alumno.financial_status === 'DEBT' ? (
                                                                     <span className="inline-flex items-center gap-1 text-red-600 bg-red-50 px-2 py-1 rounded text-xs font-bold">

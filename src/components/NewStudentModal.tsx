@@ -62,7 +62,7 @@ const NewStudentModal: React.FC<NewStudentModalProps> = ({ isOpen, onClose, onSa
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="bg-white rounded-[2rem] p-8 w-full max-w-lg shadow-2xl relative z-10 overflow-hidden"
+                        className="bg-white dark:bg-zinc-900 dark:text-zinc-100 rounded-[2rem] p-8 w-full max-w-lg shadow-2xl relative z-10 overflow-hidden"
                     >
                         {/* Header */}
                         <div className="flex justify-between items-center mb-8">
@@ -87,7 +87,7 @@ const NewStudentModal: React.FC<NewStudentModalProps> = ({ isOpen, onClose, onSa
                                     <User className="absolute left-4 top-4 text-zinc-400 w-5 h-5 group-focus-within:text-black transition-colors" />
                                     <input
                                         autoFocus
-                                        className="w-full bg-zinc-50 border-2 border-transparent focus:bg-white focus:border-black rounded-2xl pl-12 pr-4 py-4 font-bold text-sm outline-none transition-all placeholder-zinc-400"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:bg-white dark:bg-zinc-900 dark:text-zinc-100 focus:border-black rounded-2xl pl-12 pr-4 py-4 font-bold text-sm outline-none transition-all placeholder-zinc-400"
                                         placeholder="Nombre Completo"
                                         value={data.nombre}
                                         onChange={e => setData({ ...data, nombre: e.target.value })}
@@ -98,7 +98,7 @@ const NewStudentModal: React.FC<NewStudentModalProps> = ({ isOpen, onClose, onSa
                                 <div className="group relative">
                                     <Hash className="absolute left-4 top-4 text-zinc-400 w-5 h-5 group-focus-within:text-black transition-colors" />
                                     <input
-                                        className="w-full bg-zinc-50 border-2 border-transparent focus:bg-white focus:border-black rounded-2xl pl-12 pr-4 py-4 font-mono text-sm outline-none transition-all placeholder-zinc-400"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:bg-white dark:bg-zinc-900 dark:text-zinc-100 focus:border-black rounded-2xl pl-12 pr-4 py-4 font-mono text-sm outline-none transition-all placeholder-zinc-400"
                                         placeholder="Matrícula (auto-generada si vacío)"
                                         value={data.matriculaManual}
                                         onChange={e => setData({ ...data, matriculaManual: e.target.value })}
@@ -109,7 +109,7 @@ const NewStudentModal: React.FC<NewStudentModalProps> = ({ isOpen, onClose, onSa
                                 <div className="group relative">
                                     <MapPin className="absolute left-4 top-4 text-zinc-400 w-5 h-5 group-focus-within:text-black transition-colors" />
                                     <select
-                                        className="w-full bg-zinc-50 border-2 border-transparent focus:bg-white focus:border-black rounded-2xl pl-12 pr-10 py-4 font-bold text-sm outline-none transition-all appearance-none cursor-pointer text-zinc-700"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:bg-white dark:bg-zinc-900 dark:text-zinc-100 focus:border-black rounded-2xl pl-12 pr-10 py-4 font-bold text-sm outline-none transition-all appearance-none cursor-pointer text-zinc-700"
                                         value={data.sede}
                                         onChange={e => setData({ ...data, sede: e.target.value, docenteId: '' })}
                                     >
@@ -130,7 +130,7 @@ const NewStudentModal: React.FC<NewStudentModalProps> = ({ isOpen, onClose, onSa
                                     <GraduationCap className="absolute left-4 top-4 text-zinc-400 w-5 h-5 group-focus-within:text-black transition-colors" />
                                     <select
                                         required
-                                        className="w-full bg-zinc-50 border-2 border-transparent focus:bg-white focus:border-black rounded-2xl pl-12 pr-10 py-4 font-bold text-sm outline-none transition-all appearance-none cursor-pointer text-zinc-700"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:bg-white dark:bg-zinc-900 dark:text-zinc-100 focus:border-black rounded-2xl pl-12 pr-10 py-4 font-bold text-sm outline-none transition-all appearance-none cursor-pointer text-zinc-700"
                                         onChange={e => setData({ ...data, docenteId: e.target.value })}
                                         value={data.docenteId}
                                     >
@@ -155,7 +155,7 @@ const NewStudentModal: React.FC<NewStudentModalProps> = ({ isOpen, onClose, onSa
                                 <div className="group relative">
                                     <DollarSign className="absolute left-4 top-4 text-zinc-400 w-5 h-5 group-focus-within:text-black transition-colors" />
                                     <input
-                                        className="w-full bg-zinc-50 border-2 border-transparent focus:bg-white focus:border-black rounded-2xl pl-12 pr-4 py-4 font-mono text-sm outline-none transition-all placeholder-zinc-400"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:bg-white dark:bg-zinc-900 dark:text-zinc-100 focus:border-black rounded-2xl pl-12 pr-4 py-4 font-mono text-sm outline-none transition-all placeholder-zinc-400"
                                         placeholder="Colegiatura mensual"
                                         value={data.colegiatura}
                                         onChange={e => setData({ ...data, colegiatura: e.target.value })}

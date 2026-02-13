@@ -35,7 +35,7 @@ const StudentUpload: React.FC<StudentUploadProps> = ({ onBack, onUpload }) => {
     };
 
     return (
-        <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 relative">
+        <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-950 dark:text-white flex flex-col items-center justify-center p-6 relative">
             <button onClick={onBack} className="absolute top-8 left-8 p-3 rounded-full hover:bg-zinc-100 transition-colors">
                 <ArrowLeft size={24} className="text-zinc-950" />
             </button>
@@ -47,7 +47,7 @@ const StudentUpload: React.FC<StudentUploadProps> = ({ onBack, onUpload }) => {
                 </div>
 
                 {step < 3 && (
-                    <div className="bg-zinc-50 border-2 border-zinc-100 p-8 rounded-[2.5rem] shadow-sm space-y-6">
+                    <div className="bg-zinc-50 dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 border-2 border-zinc-100 p-8 rounded-[2.5rem] shadow-sm space-y-6">
                         {/* PASO 1: MATRÍCULA */}
                         <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase text-zinc-900 ml-1">Tu Matrícula Oficial</label>
@@ -57,7 +57,7 @@ const StudentUpload: React.FC<StudentUploadProps> = ({ onBack, onUpload }) => {
                                     type="text"
                                     value={matricula}
                                     onChange={(e) => setMatricula(e.target.value.toUpperCase())}
-                                    className="w-full bg-white border-2 border-zinc-200 focus:border-zinc-950 rounded-2xl py-4 pl-12 pr-4 font-mono text-xl font-bold uppercase outline-none transition-all text-zinc-950"
+                                    className="w-full bg-white dark:bg-zinc-950 text-zinc-950 dark:text-white border-2 border-zinc-200 focus:border-zinc-950 rounded-2xl py-4 pl-12 pr-4 font-mono text-xl font-bold uppercase outline-none transition-all text-zinc-950"
                                     placeholder="AGS-XXXX-XXX"
                                 />
                             </div>
@@ -67,7 +67,7 @@ const StudentUpload: React.FC<StudentUploadProps> = ({ onBack, onUpload }) => {
                         {loading && <p className="text-center text-xs font-bold text-zinc-400 animate-pulse italic">Buscando en sistema...</p>}
 
                         {student && (
-                            <div className="bg-white p-5 rounded-2xl border-2 border-green-500 animate-in zoom-in-95">
+                            <div className="bg-white dark:bg-zinc-950 text-zinc-950 dark:text-white p-5 rounded-2xl border-2 border-green-500 animate-in zoom-in-95">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-zinc-950 text-white rounded-full flex items-center justify-center font-black">
                                         {String(student.nombre || "U").charAt(0)}
@@ -84,7 +84,7 @@ const StudentUpload: React.FC<StudentUploadProps> = ({ onBack, onUpload }) => {
                         {/* SUBIDA DE COMPROBANTE */}
                         {student && (
                             <div className="space-y-4 animate-in fade-in slide-in-from-top-4">
-                                <label className={`flex flex-col items-center justify-center w-full h-44 border-2 border-dashed rounded-[2rem] cursor-pointer transition-all ${file ? 'border-green-500 bg-green-50' : 'border-zinc-300 hover:border-zinc-950 bg-white'}`}>
+                                <label className={`flex flex-col items-center justify-center w-full h-44 border-2 border-dashed rounded-[2rem] cursor-pointer transition-all ${file ? 'border-green-500 bg-green-50' : 'border-zinc-300 hover:border-zinc-950 bg-white dark:bg-zinc-950 text-zinc-950 dark:text-white'}`}>
                                     {file ? (
                                         <div className="text-center p-4">
                                             <CheckCircle className="w-10 h-10 text-green-500 mx-auto mb-2" />

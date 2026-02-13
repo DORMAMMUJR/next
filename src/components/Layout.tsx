@@ -86,9 +86,16 @@ const Layout: React.FC<LayoutProps> = ({
       </aside>
 
       {/* CONTENIDO PRINCIPAL responsive */}
-      <main className="flex-1 ml-0 md:ml-64 flex flex-col min-h-screen">
-        <Navbar activeSede={activeSede} onSedeSelect={onSedeSelect} searchData={searchData} availableSedes={availableSedes} />
-        <div className="p-4 md:p-10 flex-1 overflow-auto bg-zinc-50/50">
+      <main className="flex-1 ml-0 md:ml-64 flex flex-col min-h-screen transition-colors duration-300 dark:bg-zinc-950">
+        <Navbar
+          activeSede={activeSede}
+          onSedeSelect={onSedeSelect}
+          searchData={searchData}
+          availableSedes={availableSedes}
+          theme={theme}
+          toggleTheme={toggleTheme}
+        />
+        <div className="p-4 md:p-10 flex-1 overflow-auto bg-zinc-50/50 dark:bg-zinc-900/50 transition-colors duration-300">
           {children}
         </div>
         <Footer />
