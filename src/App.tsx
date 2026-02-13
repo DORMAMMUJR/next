@@ -97,13 +97,13 @@ const App: React.FC = () => {
     const pass = credential.trim();
     console.log("Login attempt:", { role, id, pass });
 
-    // ADMIN (Dueña): 1234 / 123
-    if (role === Role.OWNER && id === '1234' && pass === '123') {
+    // ADMIN (Dueña): admin / admin
+    if (role === Role.OWNER && id === 'admin' && pass === 'admin') {
       setActiveRole(Role.OWNER); setShowLogin(false); return { success: true };
     }
 
-    // DOCENTE: 1234 / 123 (Testing) o IDs reales
-    if (role === Role.PROFESOR && (id === '1234' || id.startsWith('doc-')) && pass === '123') {
+    // DOCENTE: 123 / 1234
+    if (role === Role.PROFESOR && (id === '123' || id.startsWith('doc-')) && pass === '1234') {
       setActiveRole(Role.PROFESOR); setShowLogin(false); return { success: true };
     }
 
@@ -170,7 +170,7 @@ const App: React.FC = () => {
       <h2 className="text-3xl font-black italic uppercase">Mis Listas</h2>
       <div className="bg-white border border-zinc-200 rounded-[32px] overflow-hidden shadow-sm">
         <table className="w-full text-left">
-          <thead className="bg-zinc-100 text-[9px] font-black uppercase text-zinc-500">
+          <thead className="bg-zinc-100 text-[9px] font-black uppercase text-zinc-600">
             <tr><th className="p-6">Alumno</th><th className="p-6">Estatus</th><th className="p-6 text-right">Nota</th></tr>
           </thead>
           <tbody>

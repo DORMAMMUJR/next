@@ -70,7 +70,7 @@ const StudentUpload: React.FC<StudentUploadProps> = ({ onBack, onUpload }) => {
                             <div className="bg-white p-5 rounded-2xl border-2 border-green-500 animate-in zoom-in-95">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-zinc-950 text-white rounded-full flex items-center justify-center font-black">
-                                        {student.nombre.charAt(0)}
+                                        {String(student.nombre || "U").charAt(0)}
                                     </div>
                                     <div>
                                         <p className="text-[10px] font-black uppercase text-green-600">Alumno Identificado ✅</p>

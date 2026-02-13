@@ -2,6 +2,7 @@ import React from 'react';
 import { Role, AppView } from '../types'; // Importa AppView
 import { LayoutDashboard, Users, Settings, LogOut } from 'lucide-react';
 import Navbar from './Navbar';
+import Footer from './Footer';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -90,6 +91,7 @@ const Layout: React.FC<LayoutProps> = ({
         <div className="p-4 md:p-10 flex-1 overflow-auto bg-zinc-50/50">
           {children}
         </div>
+        <Footer />
       </main>
 
       {/* MENÚ MÓVIL (Bottom Bar) */}

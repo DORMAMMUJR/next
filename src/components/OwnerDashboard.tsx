@@ -100,7 +100,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
 
                     {/* Columna 1: El dinero real */}
                     <div>
-                        <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest mb-2">Dinero en Caja (Confirmado)</p>
+                        <p className="text-zinc-300 text-[10px] font-black uppercase tracking-widest mb-2">Dinero en Caja (Confirmado)</p>
                         <p className="text-5xl font-black text-green-400 tracking-tighter font-mono bg-zinc-800/50 inline-block px-2 rounded-lg">${dineroReunido.toLocaleString()}</p>
                         <p className="text-xs text-zinc-500 mt-2 font-bold">De <span className="font-mono text-zinc-300">{alCorriente}</span> alumnos pagados</p>
                     </div>
@@ -108,7 +108,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                     {/* Columna 2: La barra de progreso (El detector visual) */}
                     <div className="space-y-2">
                         <div className="flex justify-between text-xs font-bold uppercase">
-                            <span className="text-zinc-400">Progreso de Cobranza</span>
+                            <span className="text-zinc-300">Progreso de Cobranza</span>
                             <span className={`font-mono ${porcentajeCobrado < 50 ? "text-red-500" : "text-green-500"}`}>{porcentajeCobrado}%</span>
                         </div>
                         <div className="h-4 w-full bg-zinc-800 rounded-full overflow-hidden border border-zinc-700">
@@ -118,7 +118,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                                     }`}
                             />
                         </div>
-                        <p className="text-[10px] text-zinc-400 text-center mt-1">
+                        <p className="text-[10px] text-zinc-300 text-center mt-1">
                             Meta Mensual: <span className="font-mono text-zinc-300">${dineroTotalEsperado.toLocaleString()}</span>
                         </p>
                     </div>

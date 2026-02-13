@@ -87,8 +87,8 @@ app.post('/api/login', async (req, res) => {
 
   try {
     if (role === 'PROFESOR') {
-      // Bypass para Testing (Usuario 1234 / Pass 123)
-      if (usuario === '1234' && password === '123') {
+      // Bypass para Testing (Usuario 123 / Pass 1234)
+      if (usuario === '123' && password === '1234') {
         return res.json({
           success: true,
           user: { id: 'doc-test', nombre_completo: 'Docente Pruebas', sede: 'aguascalientes', sede_slug: 'aguascalientes' }
@@ -108,7 +108,7 @@ app.post('/api/login', async (req, res) => {
       }
     } else {
       // Lógica para el ADMIN (Dueña)
-      if (usuario === '1234' && password === '123') {
+      if (usuario === 'admin' && password === 'admin') {
         res.json({ success: true, role: 'OWNER' });
       } else {
         res.status(401).json({ success: false, message: "Admin no reconocido" });

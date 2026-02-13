@@ -48,7 +48,7 @@ const TeachersView: React.FC<TeachersViewProps> = ({ docentes, alumnos, onOpenAd
                 {/* Barra de búsqueda */}
                 <div className="relative group w-full md:w-96">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="h-5 w-5 text-zinc-400 group-focus-within:text-blue-500 transition-colors" />
+                        <Search className="h-5 w-5 text-zinc-600 group-focus-within:text-blue-500 transition-colors" />
                     </div>
                     <input
                         type="text"
@@ -115,7 +115,7 @@ const TeachersView: React.FC<TeachersViewProps> = ({ docentes, alumnos, onOpenAd
 
             {filteredDocentes.length === 0 && (
                 <div className="text-center py-20 opacity-50">
-                    <p className="text-xl font-bold text-zinc-400">No se encontraron docentes.</p>
+                    <p className="text-xl font-bold text-zinc-600">No se encontraron docentes.</p>
                 </div>
             )}
         </div>
