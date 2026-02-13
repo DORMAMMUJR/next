@@ -1,63 +1,78 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { CITIES, CITY_KEYS } from './constants';
-import { Alumno, Matricula, Pago, CityData, City, ExpedienteAlumno, DocumentoPDF } from './types';
+import { Alumno, Matricula, Pago, CityData, City, ExpedienteAlumno, DocumentoPDF, Role, AuditLogEntry, AdminSection, Docente } from './types';
 import AIAssistant from './components/AIAssistant';
-import LandingPage from './components/LandingPage';
+import StudentLogin from './components/LandingPage';
+import Layout from './components/Layout';
+import CampusSelector from './components/CampusSelector';
+import AdminAuditTable from './components/AdminAuditTable';
+import SafeGradeInput from './components/SafeGradeInput';
+import Toast from './components/Toast';
 
 // --- SEED DATA PARA AGUASCALIENTES ---
 const SEED_AGUASCALIENTES: CityData = (() => {
+  const docentes: Docente[] = [
+    { id: "DOC-001", nombre_completo: "Lic. Roberto Gómez", sede_slug: "aguascalientes", email: "roberto.g@next.edu.mx", especialidad: "Matemáticas" },
+    { id: "DOC-002", nombre_completo: "Ing. Sofia Martínez", sede_slug: "aguascalientes", email: "sofia.m@next.edu.mx", especialidad: "Programación" }
+  ];
+
   const alumnos: Alumno[] = [];
   const matriculas: Matricula[] = [];
   const pagos: Pago[] = [];
   const expedientes: ExpedienteAlumno[] = [];
 
   const rawData = [
-    { name: "Carlos Alberto Ramírez López", mat: "NX-001023", grupo: "A1", programa: "Bachillerato Ejecutivo", estatus: "Activo" as const, pagos: [
-      { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-01-10" },
-      { c: "Mensualidad Enero", m: 1800, s: "Pagado", f: "2026-01-15" },
-      { c: "Mensualidad Febrero", m: 1800, s: "Pendiente", f: "2026-02-15" }
-    ]},
-    { name: "Mariana Fernanda Torres Cruz", mat: "NX-001024", grupo: "A2", programa: "Bachillerato Ejecutivo", estatus: "Activo" as const, pagos: [
-      { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-01-12" },
-      { c: "Mensualidad Enero", m: 1800, s: "Pagado", f: "2026-01-17" }
-    ]},
-    { name: "José Luis Hernández Vega", mat: "NX-001025", grupo: "B1", programa: "Bachillerato General", estatus: "Pausa" as const, pagos: [
-      { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-01-05" },
-      { c: "Mensualidad Enero", m: 1800, s: "Vencido", f: "2026-01-20" }
-    ]},
-    { name: "Andrea Sofía Mendoza Ruiz", mat: "NX-001026", grupo: "A1", programa: "Bachillerato Ejecutivo", estatus: "Activo" as const, pagos: [
-      { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-01-11" },
-      { c: "Mensualidad Enero", m: 1800, s: "Pagado", f: "2026-01-25" },
-      { c: "Mensualidad Febrero", m: 1800, s: "Pagado", f: "2026-02-11" }
-    ]},
-    { name: "Luis Fernando Castillo Ortiz", mat: "NX-001027", grupo: "C1", programa: "Bachillerato en Línea", estatus: "Baja" as const, pagos: [
-      { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-01-08" },
-      { c: "Mensualidad Enero", m: 1800, s: "Pagado", f: "2026-01-20" }
-    ]},
-    { name: "Valeria Gómez Paredes", mat: "NX-001028", grupo: "B2", programa: "Bachillerato Ejecutivo", estatus: "Activo" as const, pagos: [
-      { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-01-09" },
-      { c: "Mensualidad Enero", m: 1800, s: "Pagado", f: "2026-01-28" },
-      { c: "Mensualidad Febrero", m: 1800, s: "Pendiente", f: "2026-02-09" }
-    ]},
-    { name: "Miguel Ángel Navarro Salinas", mat: "NX-001029", grupo: "A3", programa: "Bachillerato General", estatus: "Activo" as const, pagos: [
-      { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-01-14" },
-      { c: "Mensualidad Enero", m: 1800, s: "Pagado", f: "2026-01-30" }
-    ]},
-    { name: "Daniela Rodríguez Morales", mat: "NX-001030", grupo: "C2", programa: "Bachillerato en Línea", estatus: "Activo" as const, pagos: [
-      { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-01-10" },
-      { c: "Mensualidad Enero", m: 1800, s: "Pagado", f: "2026-01-25" },
-      { c: "Mensualidad Febrero", m: 1800, s: "Vencido", f: "2026-02-10" }
-    ]},
-    { name: "Ricardo Iván Flores Bautista", mat: "NX-001031", grupo: "B1", programa: "Bachillerato Ejecutivo", estatus: "Activo" as const, pagos: [
-      { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-01-13" },
-      { c: "Mensualidad Enero", m: 1800, s: "Pagado", f: "2026-01-27" }
-    ]},
-    { name: "Paola Estefanía Cortés Aguilar", mat: "NX-001032", grupo: "A2", programa: "Bachillerato General", estatus: "Activo" as const, pagos: [
-      { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-01-06" },
-      { c: "Mensualidad Enero", m: 1800, s: "Pagado", f: "2026-01-15" },
-      { c: "Mensualidad Febrero", m: 1800, s: "Pendiente", f: "2026-02-06" }
-    ]}
+    // ALUMNO 1: Asignado a Roberto
+    { 
+      name: "Carlos Alberto Ramírez López", 
+      mat: "NX-001023", 
+      dob: "15082005", 
+      grupo: "A1", 
+      financial_status: 'CLEAN' as const, 
+      asistencia: 10, 
+      total_clases: 10, 
+      calif: 9.5, 
+      docente_id: "DOC-001",
+      last_activity: "2024-02-14",
+      pagos: [
+        { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-01-10", verified: true, proof: "https://placehold.co/400x600/png?text=Voucher+Inscripcion" },
+        { c: "Mensualidad Enero", m: 1800, s: "Pagado", f: "2026-01-15", verified: true, proof: "https://placehold.co/400x600/png?text=Voucher+Enero" }
+      ]
+    },
+    // ALUMNO 2: Asignado a Roberto (Deuda)
+    { 
+      name: "José Luis Hernández Vega", 
+      mat: "NX-001025", 
+      dob: "22032004", 
+      grupo: "A1", 
+      financial_status: 'DEBT' as const, 
+      asistencia: 8, 
+      total_clases: 10, 
+      calif: null, 
+      docente_id: "DOC-001",
+      last_activity: "2024-02-10",
+      pagos: [
+        { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-01-05", verified: true, proof: "https://placehold.co/400x600/png?text=Voucher+Inscripcion" },
+        { c: "Mensualidad Enero", m: 1800, s: "Vencido", f: "2026-01-20", verified: false, proof: null }
+      ]
+    },
+    // ALUMNO 3: Asignado a Sofia
+    { 
+      name: "Ana Maria Gonzalez", 
+      mat: "NX-001099", 
+      dob: "01012005", 
+      grupo: "A1", 
+      financial_status: 'DEBT' as const, 
+      asistencia: 9, 
+      total_clases: 10, 
+      calif: null, 
+      docente_id: "DOC-002",
+      last_activity: "2024-02-14",
+      pagos: [
+        { c: "Inscripción", m: 2500, s: "Pagado", f: "2026-02-01", verified: false, proof: "https://placehold.co/400x600/png?text=Falso+Comprobante" } 
+      ] 
+    },
   ];
 
   rawData.forEach(item => {
@@ -65,23 +80,20 @@ const SEED_AGUASCALIENTES: CityData = (() => {
     alumnos.push({
       id,
       nombre_completo: item.name,
+      matricula: item.mat,
+      fecha_nacimiento: item.dob,
+      financial_status: item.financial_status,
       telefono: "4491234567",
       email: `${item.name.toLowerCase().replace(/ /g, '.')}@next.edu.mx`,
       generacion: "2026",
       grupo: item.grupo,
-      estatus: item.estatus,
-      created_at: new Date().toISOString()
-    });
-
-    matriculas.push({
-      id: Math.random().toString(36).substr(2, 9),
-      alumno_id: id,
-      matricula: item.mat,
-      fecha_inscripcion: "2026-01-01",
-      programa: item.programa,
-      turno: "Matutino",
-      modalidad: "En línea",
-      expediente_folio: `FOL-${item.mat}`
+      estatus: "Activo",
+      created_at: "2026-01-01", 
+      asistencias: item.asistencia,
+      total_clases: item.total_clases,
+      calificacion_parcial: item.calif,
+      docente_id: item.docente_id,
+      last_homework_date: item.last_activity
     });
 
     item.pagos.forEach(p => {
@@ -92,11 +104,12 @@ const SEED_AGUASCALIENTES: CityData = (() => {
         monto: p.m,
         fecha_pago: p.f,
         metodo: "Transferencia",
-        estatus: p.s as any
+        estatus: p.s as any,
+        verified: p.verified,
+        proof_url: p.proof || undefined
       });
     });
 
-    // Expediente vacío inicial
     expedientes.push({
       alumno_id: id,
       docs: {},
@@ -104,346 +117,327 @@ const SEED_AGUASCALIENTES: CityData = (() => {
     });
   });
 
-  return { alumnos, matriculas, pagos, expedientes };
+  return { alumnos, matriculas, pagos, expedientes, docentes };
 })();
 
 const App: React.FC = () => {
-  const [showLanding, setShowLanding] = useState(true);
-  const [currentSlug, setCurrentSlug] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'alumnos' | 'matriculas' | 'pagos' | 'reportes' | 'expedientes'>('alumnos');
-  const [data, setData] = useState<CityData>({ alumnos: [], matriculas: [], pagos: [], expedientes: [] });
+  const [showLogin, setShowLogin] = useState(true);
+  const [currentSlug, setCurrentSlug] = useState<string | null>(null); // Start null to show campus selector
+  const [activeTab, setActiveTab] = useState<AdminSection>('dashboard');
+  const [data, setData] = useState<CityData>({ alumnos: [], matriculas: [], pagos: [], expedientes: [], docentes: [] });
   const [selectedAlumnoId, setSelectedAlumnoId] = useState<string | null>(null);
+  const [activeRole, setActiveRole] = useState<Role | null>(null);
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   
-  const urlParams = new URLSearchParams(window.location.search);
-  const urlKey = urlParams.get('k');
+  // States for Toast Notification
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-  // Verificar si venimos con parámetros (ej. link directo) para saltar la landing
-  useEffect(() => {
-    if (urlKey || window.location.search.includes('?')) {
-      setShowLanding(false);
-    }
-  }, [urlKey]);
+  // Estado para el modal de comprobantes
+  const [proofModalOpen, setProofModalOpen] = useState(false);
+  const [currentProofUrl, setCurrentProofUrl] = useState<string | null>(null);
 
+  // Cargar datos de ciudad
   useEffect(() => {
     if (currentSlug) {
       const storageKey = `NEXT_DATA_${currentSlug}`;
       const saved = localStorage.getItem(storageKey);
-      
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Migración: Asegurar que existe campo expedientes
-        if (!parsed.expedientes) parsed.expedientes = [];
-        
-        if (currentSlug === 'aguascalientes' && parsed.alumnos.length === 0) {
+        // Si es Aguascalientes y no tiene docentes, re-seed (para desarrollo)
+        if (currentSlug === 'aguascalientes' && (!parsed.docentes || parsed.docentes.length === 0)) {
           saveData(SEED_AGUASCALIENTES);
-          printSummary(SEED_AGUASCALIENTES);
         } else {
           setData(parsed);
-          if (currentSlug === 'aguascalientes') printSummary(parsed);
         }
       } else {
-        const initial = currentSlug === 'aguascalientes' ? SEED_AGUASCALIENTES : { alumnos: [], matriculas: [], pagos: [], expedientes: [] };
-        setData(initial);
-        localStorage.setItem(storageKey, JSON.stringify(initial));
-        if (currentSlug === 'aguascalientes') printSummary(initial);
+        const initial = currentSlug === 'aguascalientes' ? SEED_AGUASCALIENTES : { alumnos: [], matriculas: [], pagos: [], expedientes: [], docentes: [] };
+        saveData(initial);
       }
     }
   }, [currentSlug]);
 
-  const printSummary = (cityData: CityData) => {
-    const totalPagado = cityData.pagos.filter(p => p.estatus === 'Pagado').reduce((acc, p) => acc + p.monto, 0);
-    const totalPendiente = cityData.pagos.filter(p => p.estatus === 'Pendiente').reduce((acc, p) => acc + p.monto, 0);
-    const totalVencido = cityData.pagos.filter(p => p.estatus === 'Vencido').reduce((acc, p) => acc + p.monto, 0);
-
-    console.group(`%c NEXT SUMMARY - AGUASCALIENTES `, 'background: #22c55e; color: #fff; font-weight: bold; padding: 4px;');
-    console.log(`Total de alumnos creados: ${cityData.alumnos.length}`);
-    console.log(`Expedientes registrados: ${cityData.expedientes?.length || 0}`);
-    console.log(`Total Pagado: $${totalPagado.toLocaleString()} MXN`);
-    console.groupEnd();
-  };
+  // Cargar registros de auditoría
+  useEffect(() => {
+    const savedLogs = localStorage.getItem('NEXT_AUDIT_LOGS');
+    if (savedLogs) {
+      try {
+        setAuditLogs(JSON.parse(savedLogs));
+      } catch (e) {
+        console.error("Error parsing audit logs", e);
+      }
+    }
+  }, []);
 
   const saveData = (newData: CityData) => {
     setData(newData);
     localStorage.setItem(`NEXT_DATA_${currentSlug}`, JSON.stringify(newData));
   };
 
-  const filteredCities = CITIES.filter(c => 
-    c.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const showToast = (message: string) => {
+    setToastMsg(message);
+  };
 
-  const activeCity = CITIES.find(c => c.slug === currentSlug);
-  const isAuthorized = useMemo(() => {
-    if (!currentSlug) return true;
-    const requiredKey = CITY_KEYS[currentSlug];
-    return !requiredKey || requiredKey === urlKey;
-  }, [currentSlug, urlKey]);
+  const logAction = (user_id: string, role: Role, action: 'LOGIN_SUCCESS' | 'PANIC_BUTTON' | 'UNAUTHORIZED_ACCESS', details?: string) => {
+    const newEntry: AuditLogEntry = {
+      id: Math.random().toString(36).substr(2, 9),
+      timestamp: new Date().toISOString(),
+      user_id,
+      role,
+      action,
+      details
+    };
+    const updatedLogs = [newEntry, ...auditLogs];
+    setAuditLogs(updatedLogs);
+    localStorage.setItem('NEXT_AUDIT_LOGS', JSON.stringify(updatedLogs));
+  };
 
-  // Si estamos en modo landing, mostramos el componente LandingPage
-  if (showLanding) {
-    return <LandingPage onEnterApp={() => setShowLanding(false)} />;
-  }
-
-  if (currentSlug && !isAuthorized) {
-    return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 text-center">
-        <h2 className="text-next-green text-6xl font-black italic mb-4 uppercase">ACCESO RESTRINGIDO</h2>
-        <p className="text-white/50 font-bold uppercase tracking-widest text-xs">Esta ciudad requiere una llave de acceso válida.</p>
-        <button onClick={() => setCurrentSlug(null)} className="mt-12 bg-white text-black px-10 py-4 rounded-full font-black uppercase text-[10px] tracking-widest">Volver a Ciudades</button>
-      </div>
-    );
-  }
-
-  // --- COMPONENTES DE VISTA ---
-
-  const ExpedienteManager = ({ alumnoId }: { alumnoId: string }) => {
-    const alumno = data.alumnos.find(a => a.id === alumnoId);
-    const expediente = data.expedientes.find(e => e.alumno_id === alumnoId) || { alumno_id: alumnoId, docs: {}, updated_at: '' };
-    const [error, setError] = useState('');
-
-    const docTypes = [
-      { key: 'acta_nacimiento', label: 'Acta de nacimiento' },
-      { key: 'identificacion', label: 'Identificación' },
-      { key: 'curp', label: 'CURP' },
-      { key: 'certificacion', label: 'Certificación' },
-    ];
-
-    const countLoaded = docTypes.filter(d => !!(expediente.docs as any)[d.key]).length;
-
-    const handleFileUpload = (key: string, e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      if (file.type !== 'application/pdf') {
-        setError('Error: Solo se permiten archivos PDF.');
-        return;
-      }
-      setError('');
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64 = event.target?.result as string;
-        const newDoc: DocumentoPDF = {
-          file_name: file.name,
-          mime_type: file.type,
-          size_bytes: file.size,
-          uploaded_at: new Date().toISOString(),
-          base64_data: base64
-        };
-
-        const existingIdx = data.expedientes.findIndex(exp => exp.alumno_id === alumnoId);
-        let updatedExpedientes = [...data.expedientes];
-
-        if (existingIdx > -1) {
-          updatedExpedientes[existingIdx] = {
-            ...updatedExpedientes[existingIdx],
-            docs: { ...updatedExpedientes[existingIdx].docs, [key]: newDoc },
-            updated_at: new Date().toISOString()
-          };
-        } else {
-          updatedExpedientes.push({
-            alumno_id: alumnoId,
-            docs: { [key]: newDoc },
-            updated_at: new Date().toISOString()
-          });
+  const handleLogin = async (identifier: string, credential: string, role: Role): Promise<{ success: boolean; error?: string; status?: 'CLEAN' | 'DEBT' }> => {
+    if (role === Role.ALUMNO) {
+      if (identifier === '123' && credential === '123') {
+        const demoStudent = SEED_AGUASCALIENTES.alumnos[0];
+        // We load Aguascalientes data for the demo student automatically
+        setCurrentSlug('aguascalientes');
+        if (demoStudent) {
+           logAction('DEMO-ALUMNO', Role.ALUMNO, 'LOGIN_SUCCESS', 'Acceso Rápido Demo');
+           setSelectedAlumnoId(demoStudent.id);
+           setActiveRole(Role.ALUMNO);
+           setShowLogin(false);
+           return { success: true, status: demoStudent.financial_status || 'CLEAN' };
         }
-
-        saveData({ ...data, expedientes: updatedExpedientes });
-      };
-      reader.readAsDataURL(file);
-    };
-
-    const viewDoc = (base64: string) => {
-      const win = window.open();
-      if (win) {
-        win.document.write(`<iframe src="${base64}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
       }
-    };
 
-    return (
-      <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4">
-        <div className="flex justify-between items-end">
-          <div>
-            <button onClick={() => setSelectedAlumnoId(null)} className="text-zinc-400 font-black text-[9px] uppercase tracking-widest mb-4 hover:text-black transition-colors">← Volver al Listado</button>
-            <h3 className="text-4xl font-black italic uppercase tracking-tighter">Expediente: {alumno?.nombre_completo}<span className="text-next-green">.</span></h3>
-            <p className="text-zinc-500 font-bold text-[11px] uppercase tracking-widest mt-2">
-              Estado: <span className={countLoaded === 4 ? 'text-next-green' : 'text-orange-500'}>{countLoaded}/4 Documentos cargados</span>
-            </p>
-          </div>
-        </div>
-
-        {error && <div className="bg-red-50 text-red-600 p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest">{error}</div>}
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {docTypes.map(doc => {
-            const file = (expediente.docs as any)[doc.key] as DocumentoPDF | undefined;
-            return (
-              <div key={doc.key} className={`p-8 rounded-[40px] border-2 transition-all ${file ? 'bg-white border-zinc-100 shadow-sm' : 'bg-zinc-50 border-dashed border-zinc-200 opacity-80'}`}>
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h4 className="font-black text-xs uppercase tracking-widest text-black mb-1">{doc.label}</h4>
-                    <p className={`text-[9px] font-black uppercase tracking-widest ${file ? 'text-next-green' : 'text-zinc-400'}`}>
-                      {file ? '● Cargado' : '○ No cargado'}
-                    </p>
-                  </div>
-                  <span className="text-3xl">{file ? '📄' : '📁'}</span>
-                </div>
-
-                {file ? (
-                  <div className="space-y-4">
-                    <div className="bg-zinc-50 p-4 rounded-2xl">
-                      <p className="text-[10px] font-bold text-zinc-600 truncate">{file.file_name}</p>
-                      <p className="text-[8px] font-black uppercase tracking-widest text-zinc-400 mt-1">
-                        Subido: {new Date(file.uploaded_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => viewDoc(file.base64_data)}
-                        className="flex-1 bg-black text-white py-3 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-next-green transition-all"
-                      >
-                        Ver Documento
-                      </button>
-                      <label className="flex-1 text-center bg-zinc-100 text-zinc-600 py-3 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-zinc-200 transition-all cursor-pointer">
-                        Reemplazar
-                        <input type="file" className="hidden" accept="application/pdf" onChange={(e) => handleFileUpload(doc.key, e)} />
-                      </label>
-                    </div>
-                  </div>
-                ) : (
-                  <label className="block w-full text-center py-10 rounded-[32px] border-2 border-dashed border-zinc-200 text-zinc-400 hover:border-next-green hover:text-next-green transition-all cursor-pointer group">
-                    <span className="text-2xl block mb-2 group-hover:scale-110 transition-transform">+</span>
-                    <span className="font-black text-[9px] uppercase tracking-widest">Subir PDF</span>
-                    <input type="file" className="hidden" accept="application/pdf" onChange={(e) => handleFileUpload(doc.key, e)} />
-                  </label>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  const AlumnosView = () => {
-    const [isAdding, setIsAdding] = useState(false);
-    const [form, setForm] = useState<Partial<Alumno>>({ estatus: 'Activo' });
-
-    const handleAdd = () => {
-      const newId = Math.random().toString(36).substr(2, 9);
-      const newAlumno: Alumno = {
-        id: newId,
-        nombre_completo: form.nombre_completo || '',
-        telefono: form.telefono || '',
-        email: form.email || '',
-        generacion: form.generacion || '2026',
-        grupo: form.grupo || 'A',
-        estatus: form.estatus as any,
-        created_at: new Date().toISOString()
-      };
+      const alumno = data.alumnos.find(a => a.matricula === identifier && a.fecha_nacimiento === credential);
+      if (!alumno) return { success: false, error: "Credenciales incorrectas." };
       
-      const newExpediente: ExpedienteAlumno = {
-        alumno_id: newId,
-        docs: {},
-        updated_at: new Date().toISOString()
-      };
+      logAction(identifier, Role.ALUMNO, 'LOGIN_SUCCESS', alumno.financial_status === 'DEBT' ? 'Login con bloqueo por deuda' : 'Acceso limpio');
 
-      saveData({ 
-        ...data, 
-        alumnos: [...data.alumnos, newAlumno],
-        expedientes: [...(data.expedientes || []), newExpediente]
-      });
-      setIsAdding(false);
-      setForm({ estatus: 'Activo' });
-    };
+      if (alumno.financial_status === 'DEBT') return { success: false, status: 'DEBT' };
+      
+      setSelectedAlumnoId(alumno.id);
+      setActiveRole(Role.ALUMNO);
+      setShowLogin(false);
+      return { success: true, status: 'CLEAN' };
+    } 
+    else if (role === Role.PROFESOR) {
+      if ((identifier === '123' && credential === '1234') || identifier === 'DOC-2026' || identifier === 'DOC-001') {
+        logAction(identifier, Role.PROFESOR, 'LOGIN_SUCCESS');
+        setActiveRole(Role.PROFESOR);
+        // Default teacher to Aguascalientes for now, or could force a selection
+        setCurrentSlug('aguascalientes');
+        setShowLogin(false);
+        return { success: true, status: 'CLEAN' };
+      }
+      return { success: false, error: "Error de docente." };
+    }
+    else if (role === Role.OWNER) {
+      if ((identifier === '1234' && credential === '123') || (identifier === 'OWNER' && credential === 'ADMIN')) {
+        logAction(identifier, Role.OWNER, 'LOGIN_SUCCESS');
+        setActiveRole(Role.OWNER);
+        // Owner doesn't auto-select a city, they go to Campus Selector
+        setCurrentSlug(null); 
+        setShowLogin(false);
+        return { success: true, status: 'CLEAN' };
+      }
+      return { success: false, error: "Acceso no autorizado." };
+    }
+    return { success: false, error: "Rol no reconocido." };
+  };
+
+  const togglePaymentVerification = (pagoId: string, currentStatus: boolean, alumnoId: string) => {
+    const updatedPagos = data.pagos.map(p => {
+      if (p.id === pagoId) {
+        return { ...p, verified: !currentStatus };
+      }
+      return p;
+    });
+
+    const studentPagos = updatedPagos.filter(p => p.alumno_id === alumnoId);
+    const hasPendingOrUnverified = studentPagos.some(p => p.estatus === 'Vencido' || (p.estatus === 'Pagado' && !p.verified));
+    const newStatus = hasPendingOrUnverified ? 'DEBT' : 'CLEAN';
+
+    const updatedAlumnos = data.alumnos.map(a => {
+      if (a.id === alumnoId) {
+        return { ...a, financial_status: newStatus };
+      }
+      return a;
+    });
+
+    saveData({ ...data, pagos: updatedPagos, alumnos: updatedAlumnos });
+    showToast(!currentStatus ? "Pago validado correctamente" : "Validación revocada");
+  };
+
+  const handleGradeSave = (alumnoId: string, newGrade: number) => {
+    const updatedAlumnos = data.alumnos.map(a => {
+      if (a.id === alumnoId) {
+        return { ...a, calificacion_parcial: newGrade };
+      }
+      return a;
+    });
+    saveData({ ...data, alumnos: updatedAlumnos });
+    showToast(`Calificación asignada correctamente.`);
+  };
+
+  const openProofModal = (url: string) => {
+    setCurrentProofUrl(url);
+    setProofModalOpen(true);
+  };
+
+  // --- VISTAS ESTRATÉGICAS ---
+
+  // 1. LA DUEÑA: DETECTOR DE MENTIRAS + AUDITORÍA MAESTRA
+  const OwnerDashboard = () => {
+    // If no slug is selected, show Campus Selector
+    if (!currentSlug) {
+      return (
+        <CampusSelector 
+          onSelect={(slug) => {
+            setCurrentSlug(slug);
+            // Optionally default active tab if needed, but dashboard is fine
+            setActiveTab('dashboard');
+          }} 
+        />
+      );
+    }
+
+    // If slug selected, show Audit Dashboard for that city
+    const totalStudents = data.alumnos.length;
+    const totalVerifiedIncome = data.pagos.filter(p => p.estatus === 'Pagado' && p.verified).reduce((acc, curr) => acc + curr.monto, 0);
 
     return (
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-3xl font-black italic uppercase tracking-tighter">Padrón de Alumnos<span className="text-next-green">.</span></h3>
-          <button 
-            onClick={() => setIsAdding(true)}
-            className="bg-black text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-next-green transition-all"
-          >
-            + Nuevo Alumno
-          </button>
+      <div className="space-y-10 animate-in fade-in pb-20">
+        <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-zinc-100 pb-8">
+          <div>
+             <button 
+                onClick={() => setCurrentSlug(null)}
+                className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-black mb-2 flex items-center gap-1 transition-colors"
+             >
+               ← Volver a Sedes
+             </button>
+             <h2 className="text-4xl font-black italic uppercase tracking-tighter text-black">Sede {currentSlug}</h2>
+             <p className="text-xs font-bold text-zinc-500 mt-1">Panel de Auditoría y Control Financiero</p>
+          </div>
+          
+          <div className="flex gap-8 text-right">
+             <div className="bg-zinc-50 px-6 py-3 rounded-2xl border border-zinc-100">
+                <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Alumnos Activos</p>
+                <p className="text-2xl font-black">{totalStudents}</p>
+             </div>
+             <div className="bg-zinc-50 px-6 py-3 rounded-2xl border border-zinc-100">
+                <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Ingreso Validado</p>
+                <p className="text-2xl font-black text-next-green font-mono">${totalVerifiedIncome.toLocaleString()}</p>
+             </div>
+          </div>
         </div>
 
-        {isAdding && (
-          <div className="bg-zinc-50 p-10 rounded-[40px] border border-zinc-100 grid md:grid-cols-2 gap-6 animate-in zoom-in-95">
-            <input type="text" placeholder="Nombre Completo" className="bg-white border-none rounded-2xl px-6 py-4 font-bold text-sm text-black" onChange={e => setForm({...form, nombre_completo: e.target.value})} />
-            <input type="text" placeholder="Teléfono" className="bg-white border-none rounded-2xl px-6 py-4 font-bold text-sm text-black" onChange={e => setForm({...form, telefono: e.target.value})} />
-            <input type="email" placeholder="Email" className="bg-white border-none rounded-2xl px-6 py-4 font-bold text-sm text-black" onChange={e => setForm({...form, email: e.target.value})} />
-            <select className="bg-white border-none rounded-2xl px-6 py-4 font-bold text-sm text-black" onChange={e => setForm({...form, estatus: e.target.value as any})}>
-              <option value="Activo">Activo</option>
-              <option value="Baja">Baja</option>
-              <option value="Pausa">Pausa</option>
-            </select>
-            <div className="md:col-span-2 flex gap-4">
-              <button onClick={handleAdd} className="bg-next-green text-white px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">Guardar</button>
-              <button onClick={() => setIsAdding(false)} className="bg-zinc-200 text-zinc-600 px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">Cancelar</button>
-            </div>
-          </div>
-        )}
+        {/* Master Audit Grid (Grouped by Teacher) */}
+        <AdminAuditTable 
+          data={data}
+          onVerifyPayment={togglePaymentVerification}
+          onOpenProof={openProofModal}
+        />
+      </div>
+    );
+  };
 
-        <div className="bg-white border border-zinc-100 rounded-[48px] overflow-hidden shadow-sm">
+  const AuditLogView = () => {
+    return (
+      <div className="space-y-8 animate-in fade-in">
+        <h2 className="text-4xl font-black italic uppercase tracking-tighter text-black">Bitácora de Accesos <span className="text-next-green">.</span></h2>
+        <div className="bg-white border border-zinc-200 rounded-[32px] overflow-hidden shadow-sm">
+          <div className="max-h-[600px] overflow-y-auto">
+            <table className="w-full text-left">
+              <thead className="bg-zinc-100 text-[9px] font-black uppercase tracking-widest text-zinc-600 sticky top-0 z-10">
+                <tr>
+                  <th className="p-6">Fecha y Hora</th>
+                  <th className="p-6">Usuario (ID)</th>
+                  <th className="p-6">Rol</th>
+                  <th className="p-6">Acción</th>
+                  <th className="p-6">Detalles</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100">
+                {auditLogs.map((log) => (
+                  <tr key={log.id} className="hover:bg-zinc-50 transition-colors">
+                    <td className="p-6 text-xs font-mono text-zinc-700">
+                      {new Date(log.timestamp).toLocaleDateString('es-MX')} <span className="text-black font-bold">{new Date(log.timestamp).toLocaleTimeString('es-MX')}</span>
+                    </td>
+                    <td className="p-6 font-bold text-sm font-mono text-black">{log.user_id}</td>
+                    <td className="p-6">
+                      <span className={`px-2 py-1 rounded text-[8px] font-black uppercase tracking-wider
+                        ${log.role === Role.OWNER ? 'bg-black text-white' : 
+                          log.role === Role.PROFESOR ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
+                        {log.role}
+                      </span>
+                    </td>
+                    <td className="p-6 text-[10px] font-black uppercase tracking-wide">
+                      {log.action === 'LOGIN_SUCCESS' && <span className="text-green-700">✅ Inicio de Sesión</span>}
+                      {log.action === 'PANIC_BUTTON' && <span className="text-red-700">🚨 Botón de Pánico</span>}
+                    </td>
+                    <td className="p-6 text-xs text-zinc-600 italic">
+                      {log.details || '-'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // 2. EL DOCENTE: FILTRO DE SEGURIDAD
+  const TeacherView = () => {
+    return (
+      <div className="space-y-8 animate-in fade-in">
+        <h2 className="text-4xl font-black italic uppercase tracking-tighter text-black">Lista de Calificaciones <span className="text-next-green">.</span></h2>
+        <div className="bg-zinc-50 p-6 rounded-3xl border border-zinc-200 mb-6 flex items-start gap-4">
+           <span className="text-2xl">ℹ️</span>
+           <div>
+             <h4 className="font-black text-sm uppercase text-zinc-900 mb-1">Política de Asentamiento de Notas</h4>
+             <p className="text-xs text-zinc-600 leading-relaxed">
+               Las calificaciones guardadas entran en estado de "Lectura" para evitar ediciones accidentales.
+               <br/>
+               Los alumnos con estatus <span className="font-bold bg-zinc-200 px-1 rounded text-[10px] uppercase">Bloqueado</span> no pueden recibir calificación hasta regularizar sus pagos.
+             </p>
+           </div>
+        </div>
+
+        <div className="bg-white border border-zinc-200 rounded-[32px] overflow-visible shadow-sm pb-32">
           <table className="w-full text-left">
-            <thead className="bg-zinc-50 text-[9px] font-black uppercase tracking-widest text-zinc-400">
+            <thead className="bg-zinc-100 text-[9px] font-black uppercase tracking-widest text-zinc-600">
               <tr>
-                <th className="px-10 py-6">Alumno</th>
-                <th className="px-6 py-6">Matrícula</th>
-                <th className="px-6 py-6">Expediente</th>
-                <th className="px-6 py-6">Estatus</th>
-                <th className="px-10 py-6 text-right">Acción</th>
+                <th className="p-6">Alumno</th>
+                <th className="p-6">Matrícula</th>
+                <th className="p-6">Estatus</th>
+                <th className="p-6 text-right w-48">Calificación Parcial 1</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-50">
+            <tbody className="divide-y divide-zinc-100">
               {data.alumnos.map(a => {
-                const matricula = data.matriculas.find(m => m.alumno_id === a.id);
-                const expediente = data.expedientes?.find(e => e.alumno_id === a.id);
-                const loadedCount = expediente ? Object.keys(expediente.docs).length : 0;
+                const isBlocked = a.financial_status === 'DEBT';
                 return (
-                  <tr key={a.id} className="hover:bg-zinc-50/50 transition-colors">
-                    <td className="px-10 py-6">
-                      <p className="font-black text-sm uppercase italic text-black">{a.nombre_completo}</p>
-                      <p className="text-[10px] font-bold text-zinc-400">Grupo: {a.grupo}</p>
+                  <tr key={a.id} className={`transition-all ${isBlocked ? 'bg-zinc-50/50' : 'hover:bg-zinc-50'}`}>
+                    <td className="p-6">
+                      <p className="font-bold text-sm uppercase text-black">{a.nombre_completo}</p>
+                      {isBlocked && <p className="text-[9px] text-red-600 font-black uppercase mt-1">🔒 Bloqueo Administrativo</p>}
                     </td>
-                    <td className="px-6 py-6">
-                      <p className="text-[11px] font-black tracking-widest text-zinc-400 uppercase">{matricula?.matricula || 'SIN MATRÍCULA'}</p>
-                    </td>
-                    <td className="px-6 py-6">
-                      <button 
-                        onClick={() => { setSelectedAlumnoId(a.id); setActiveTab('expedientes'); }}
-                        className={`text-[9px] font-black uppercase tracking-widest flex items-center gap-2 group transition-colors ${loadedCount === 4 ? 'text-next-green' : 'text-orange-500'}`}
-                      >
-                         <span className="bg-current/10 px-2 py-1 rounded-md group-hover:bg-current group-hover:text-white transition-all">{loadedCount}/4 Doc</span>
-                         {loadedCount === 4 ? '✅' : '⏳'}
-                      </button>
-                    </td>
-                    <td className="px-6 py-6">
-                      <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${
-                        a.estatus === 'Activo' ? 'bg-green-100 text-green-700' : 
-                        a.estatus === 'Baja' ? 'bg-red-100 text-red-700' : 'bg-zinc-100 text-zinc-500'
-                      }`}>
-                        {a.estatus}
+                    <td className="p-6 text-xs font-mono text-zinc-700">{a.matricula}</td>
+                    <td className="p-6">
+                      <span className={`px-2 py-1 rounded text-[8px] font-black uppercase ${isBlocked ? 'bg-zinc-200 text-zinc-600' : 'bg-green-100 text-green-800'}`}>
+                        {isBlocked ? 'Restringido' : 'Habilitado'}
                       </span>
                     </td>
-                    <td className="px-10 py-6 text-right space-x-4">
-                      <button 
-                        onClick={() => { setSelectedAlumnoId(a.id); setActiveTab('expedientes'); }}
-                        className="text-black font-black text-[9px] uppercase tracking-widest hover:text-next-green"
-                      >
-                        Expediente
-                      </button>
-                      <button 
-                        onClick={() => { setSelectedAlumnoId(a.id); setActiveTab('reportes'); }}
-                        className="text-next-green font-black text-[9px] uppercase tracking-widest hover:underline"
-                      >
-                        Detalle →
-                      </button>
+                    <td className="p-6 text-right relative z-10">
+                       <SafeGradeInput 
+                         currentGrade={a.calificacion_parcial}
+                         studentName={a.nombre_completo}
+                         isLocked={isBlocked}
+                         onSave={(newGrade) => handleGradeSave(a.id, newGrade)}
+                       />
                     </td>
                   </tr>
-                );
+                )
               })}
             </tbody>
           </table>
@@ -452,253 +446,109 @@ const App: React.FC = () => {
     );
   };
 
-  const PagosView = () => {
-    const [isAdding, setIsAdding] = useState(false);
-    const [form, setForm] = useState<Partial<Pago>>({ estatus: 'Pagado', concepto: 'Mensualidad' });
-
-    const handleAdd = () => {
-      const newPago: Pago = {
-        id: Math.random().toString(36).substr(2, 5),
-        alumno_id: form.alumno_id || '',
-        concepto: form.concepto as any,
-        monto: Number(form.monto) || 0,
-        fecha_pago: new Date().toISOString().split('T')[0],
-        metodo: 'Transferencia',
-        estatus: form.estatus as any
-      };
-      saveData({ ...data, pagos: [...data.pagos, newPago] });
-      setIsAdding(false);
-    };
-
-    const totalIngresos = data.pagos.filter(p => p.estatus === 'Pagado').reduce((acc, curr) => acc + curr.monto, 0);
-
-    return (
-      <div className="space-y-8 animate-in fade-in">
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-black p-10 rounded-[48px] text-white shadow-2xl">
-            <p className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-2">Total Recaudado</p>
-            <p className="text-4xl font-black italic">${totalIngresos.toLocaleString()}</p>
-          </div>
-          <div className="bg-zinc-50 p-10 rounded-[48px] border border-zinc-100 col-span-2 flex justify-between items-center">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2">Control Financiero</p>
-              <h3 className="text-2xl font-black italic uppercase">Gestión de Cobranza</h3>
-            </div>
-            <button 
-              onClick={() => setIsAdding(true)}
-              className="bg-next-green text-white px-10 py-4 rounded-3xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-next-green/20"
-            >
-              Registrar Pago
-            </button>
-          </div>
-        </div>
-
-        {isAdding && (
-          <div className="bg-zinc-50 p-10 rounded-[40px] border border-zinc-100 grid md:grid-cols-3 gap-6">
-            <select className="bg-white border-none rounded-2xl px-6 py-4 font-bold text-sm text-black" onChange={e => setForm({...form, alumno_id: e.target.value})}>
-              <option value="">Seleccionar Alumno</option>
-              {data.alumnos.map(a => <option key={a.id} value={a.id}>{a.nombre_completo}</option>)}
-            </select>
-            <input type="number" placeholder="Monto $" className="bg-white border-none rounded-2xl px-6 py-4 font-bold text-sm text-black" onChange={e => setForm({...form, monto: Number(e.target.value)})} />
-            <select className="bg-white border-none rounded-2xl px-6 py-4 font-bold text-sm text-black" onChange={e => setForm({...form, concepto: e.target.value as any})}>
-              <option value="Inscripción">Inscripción</option>
-              <option value="Mensualidad">Mensualidad</option>
-              <option value="Examen">Examen</option>
-            </select>
-            <button onClick={handleAdd} className="bg-black text-white px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">Confirmar</button>
-            <button onClick={() => setIsAdding(false)} className="bg-zinc-200 text-zinc-600 px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">Cancelar</button>
-          </div>
-        )}
-
-        <div className="bg-white border border-zinc-100 rounded-[48px] overflow-hidden shadow-sm">
-          <table className="w-full text-left">
-            <thead className="bg-zinc-50 text-[9px] font-black uppercase tracking-widest text-zinc-400">
-              <tr>
-                <th className="px-10 py-6">Folio</th>
-                <th className="px-6 py-6">Alumno</th>
-                <th className="px-6 py-6">Monto</th>
-                <th className="px-6 py-6">Estatus</th>
-                <th className="px-10 py-6 text-right">Fecha</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-50">
-              {data.pagos.sort((a,b) => b.fecha_pago.localeCompare(a.fecha_pago)).map(p => {
-                const alumno = data.alumnos.find(a => a.id === p.alumno_id);
-                return (
-                  <tr key={p.id} className="hover:bg-zinc-50/50 transition-colors">
-                    <td className="px-10 py-6 font-black text-xs text-zinc-400 uppercase tracking-widest">#{p.id}</td>
-                    <td className="px-6 py-6">
-                      <p className="font-bold text-black uppercase text-[11px]">{alumno?.nombre_completo || 'Desconocido'}</p>
-                      <p className="text-[10px] text-zinc-400 font-medium">{p.concepto}</p>
-                    </td>
-                    <td className="px-6 py-6 font-black text-black text-sm">${p.monto.toLocaleString()}</td>
-                    <td className="px-6 py-6">
-                      <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${
-                        p.estatus === 'Pagado' ? 'bg-green-100 text-green-700' : 
-                        p.estatus === 'Vencido' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'
-                      }`}>
-                        {p.estatus}
-                      </span>
-                    </td>
-                    <td className="px-10 py-6 text-right font-medium text-zinc-400 text-xs">{p.fecha_pago}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
-  };
-
-  const ExpedientesGeneralView = () => {
-    if (selectedAlumnoId) return <ExpedienteManager alumnoId={selectedAlumnoId} />;
-
-    return (
-      <div className="space-y-8 animate-in fade-in">
-        <header>
-          <h3 className="text-4xl font-black italic uppercase tracking-tighter">Control de Expedientes<span className="text-next-green">.</span></h3>
-          <p className="text-zinc-500 font-bold text-[10px] uppercase tracking-widest mt-2">Carga y administración de documentación oficial</p>
-        </header>
-
-        <div className="bg-white border border-zinc-100 rounded-[48px] overflow-hidden">
-          <table className="w-full text-left">
-             <thead className="bg-zinc-50 text-[9px] font-black uppercase tracking-widest text-zinc-400">
-               <tr>
-                 <th className="px-10 py-6">Alumno</th>
-                 <th className="px-6 py-6">Progreso</th>
-                 <th className="px-10 py-6 text-right">Administrar</th>
-               </tr>
-             </thead>
-             <tbody className="divide-y divide-zinc-50">
-               {data.alumnos.map(a => {
-                 const expediente = data.expedientes?.find(e => e.alumno_id === a.id);
-                 const count = expediente ? Object.keys(expediente.docs).length : 0;
-                 return (
-                   <tr key={a.id} className="hover:bg-zinc-50/50 transition-colors">
-                     <td className="px-10 py-6 font-black text-sm uppercase italic text-black">{a.nombre_completo}</td>
-                     <td className="px-6 py-6">
-                       <div className="w-full max-w-[200px] h-2 bg-zinc-100 rounded-full overflow-hidden">
-                         <div className={`h-full transition-all duration-700 ${count === 4 ? 'bg-next-green' : 'bg-orange-400'}`} style={{ width: `${(count / 4) * 100}%` }}></div>
-                       </div>
-                       <p className="text-[9px] font-black uppercase tracking-widest mt-2 text-zinc-400">{count}/4 Cargados</p>
-                     </td>
-                     <td className="px-10 py-6 text-right">
-                       <button 
-                         onClick={() => setSelectedAlumnoId(a.id)}
-                         className="bg-zinc-900 text-white px-6 py-2.5 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-next-green transition-all"
-                       >
-                         Ver Expediente
-                       </button>
-                     </td>
-                   </tr>
-                 );
-               })}
-             </tbody>
-          </table>
-        </div>
-      </div>
-    );
-  };
-
-  // --- MAIN RENDER ---
-
-  if (!currentSlug) {
-    return (
-      <div className="min-h-screen bg-white p-6 md:p-20 overflow-x-hidden">
-        <header className="max-w-7xl mx-auto mb-20 text-center">
-          <h1 className="text-7xl md:text-[10rem] font-black tracking-tighter italic uppercase leading-none text-black">
-            NEXT<span className="text-next-green">.</span>
-          </h1>
-          <p className="text-zinc-900 font-bold uppercase tracking-[0.5em] text-xs mt-8">Panel Administrativo Multisede</p>
-          <div className="mt-12 max-w-xl mx-auto">
-            <input 
-              type="text" 
-              placeholder="BUSCAR CIUDAD..." 
-              className="w-full bg-white border-2 border-zinc-200 rounded-[32px] px-10 py-6 text-center font-black text-sm uppercase tracking-widest focus:ring-2 focus:ring-next-green outline-none text-black placeholder:text-zinc-500 shadow-sm"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </header>
-
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in duration-700">
-          {filteredCities.map(city => (
-            <button 
-              key={city.slug}
-              onClick={() => setCurrentSlug(city.slug)}
-              className="group bg-white border border-zinc-200 p-10 rounded-[48px] text-left hover:bg-black hover:scale-105 transition-all duration-500 shadow-sm"
-            >
-              <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1 group-hover:text-next-green transition-colors">REGIÓN MÉXICO</p>
-              <h3 className="text-2xl font-black italic uppercase tracking-tighter text-black group-hover:text-white transition-colors">{city.name}</h3>
-              <div className="mt-8 flex justify-end">
-                <span className="text-3xl opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 group-hover:text-white">→</span>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    );
+  // 3. MAIN RENDER
+  if (showLogin) {
+    return <StudentLogin onLogin={handleLogin} />;
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col md:flex-row">
-      <aside className="w-full md:w-80 bg-zinc-50 border-r border-zinc-100 p-10 flex flex-col fixed md:sticky top-0 h-screen">
-        <button onClick={() => { setCurrentSlug(null); setSelectedAlumnoId(null); setShowLanding(true); }} className="text-2xl font-black italic uppercase tracking-tighter mb-12 hover:opacity-50 transition-opacity">
-          NEXT<span className="text-next-green">.</span>
-        </button>
-        
-        <div className="mb-12">
-          <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-2">Sede Seleccionada</p>
-          <h2 className="text-3xl font-black italic uppercase tracking-tighter leading-none">{activeCity?.name}</h2>
+    <>
+      {activeRole === Role.OWNER && (
+        <Layout 
+          activeRole={Role.OWNER} 
+          onRoleSelect={() => {}} 
+          onHome={() => {
+            setCurrentSlug(null); // Reset to Campus Selector when clicking Home
+            setActiveTab('dashboard');
+          }} 
+          onLogout={() => setShowLogin(true)} 
+          onSedes={() => setCurrentSlug(null)}
+          currentAdminSection={activeTab}
+          onAdminSectionChange={(section) => setActiveTab(section)}
+        >
+          {activeTab === 'dashboard' && <OwnerDashboard />}
+          {activeTab === 'auditoria' && <AuditLogView />}
+          {activeTab !== 'dashboard' && activeTab !== 'auditoria' && (
+             <div className="p-10 text-center font-black uppercase text-zinc-300">Módulo en construcción</div>
+          )}
+        </Layout>
+      )}
+
+      {activeRole === Role.PROFESOR && (
+        <Layout activeRole={Role.PROFESOR} onRoleSelect={() => {}} onHome={() => setActiveTab('materias')} onLogout={() => setShowLogin(true)} onSedes={() => {}}>
+          <TeacherView />
+        </Layout>
+      )}
+
+      {activeRole === Role.ALUMNO && (
+        <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+           <div className="max-w-2xl w-full text-center space-y-8 animate-in zoom-in-95">
+              <h1 className="text-5xl font-black italic uppercase text-black">Bienvenido, {data.alumnos.find(a => a.id === selectedAlumnoId)?.nombre_completo.split(' ')[0]}<span className="text-next-green">.</span></h1>
+              {data.alumnos.find(a => a.id === selectedAlumnoId)?.financial_status === 'CLEAN' ? (
+                <div className="bg-green-50 border-2 border-green-500 p-8 rounded-[40px]">
+                   <span className="text-5xl mb-4 block">✅</span>
+                   <h3 className="text-2xl font-black uppercase text-green-800 mb-2">Estás al corriente</h3>
+                   <p className="text-xs font-bold text-green-900 uppercase">Tienes acceso total a tus clases y envío de tareas.</p>
+                </div>
+              ) : (
+                <div className="bg-red-50 border-2 border-red-500 p-8 rounded-[40px]">
+                   <span className="text-5xl mb-4 block">🚫</span>
+                   <h3 className="text-2xl font-black uppercase text-red-800 mb-2">Pago en revisión o pendiente</h3>
+                   <p className="text-xs font-bold text-red-900 uppercase">Tu pago no ha sido conciliado por auditoría o presentas adeudo.</p>
+                </div>
+              )}
+              <button onClick={() => setShowLogin(true)} className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-black">Cerrar Sesión</button>
+           </div>
         </div>
+      )}
 
-        <nav className="space-y-3 flex-1 overflow-y-auto">
-          {[
-            { id: 'alumnos', label: 'Alumnos', icon: '👥' },
-            { id: 'expedientes', label: 'Expediente', icon: '📁' },
-            { id: 'matriculas', label: 'Matrículas', icon: '📋' },
-            { id: 'pagos', label: 'Pagos', icon: '💳' },
-            { id: 'reportes', label: 'Reportes', icon: '📊' },
-          ].map(item => (
-            <button
-              key={item.id}
-              onClick={() => { setActiveTab(item.id as any); if (item.id !== 'expedientes') setSelectedAlumnoId(null); }}
-              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                activeTab === item.id ? 'bg-black text-white shadow-xl shadow-black/20' : 'text-zinc-500 hover:bg-zinc-100'
-              }`}
-            >
-              <span className="text-xl">{item.icon}</span>
-              {item.label}
-            </button>
-          ))}
-        </nav>
+      {/* TOAST NOTIFICATION */}
+      {toastMsg && (
+        <Toast message={toastMsg} onClose={() => setToastMsg(null)} />
+      )}
 
-        <button onClick={() => { setCurrentSlug(null); setSelectedAlumnoId(null); setShowLanding(true); }} className="mt-auto pt-10 text-[9px] font-black text-zinc-400 uppercase tracking-widest hover:text-red-500 transition-colors">
-          ← Cambiar de Ciudad
-        </button>
-      </aside>
-
-      <main className="flex-1 p-6 md:p-16 max-w-[1400px]">
-        {activeTab === 'alumnos' && <AlumnosView />}
-        {activeTab === 'pagos' && <PagosView />}
-        {activeTab === 'expedientes' && <ExpedientesGeneralView />}
-        {activeTab === 'matriculas' && (
-          <div className="py-20 text-center space-y-4">
-             <h2 className="text-5xl font-black italic uppercase opacity-10">Módulo en Desarrollo</h2>
-             <p className="text-zinc-400 font-bold uppercase tracking-widest text-[10px]">Gestión de Expedientes Digitales RVOE</p>
+      {/* MODAL COMPROBANTES */}
+      {proofModalOpen && currentProofUrl && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl overflow-hidden max-w-4xl w-full h-[85vh] flex flex-col shadow-2xl relative ring-1 ring-white/10">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-zinc-100 bg-white">
+               <h3 className="text-sm font-black uppercase tracking-widest text-zinc-900">Evidencia de Pago</h3>
+               <button 
+                  onClick={() => setProofModalOpen(false)}
+                  className="w-10 h-10 bg-zinc-100 hover:bg-zinc-200 rounded-full flex items-center justify-center text-zinc-900 font-bold transition-all"
+               >
+                  ✕
+               </button>
+            </div>
+            
+            {/* Image Container */}
+            <div className="flex-1 bg-zinc-50 flex items-center justify-center p-4 overflow-hidden relative">
+               {/* Pattern background for transparency/empty space */}
+               <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+               
+               <img 
+                 src={currentProofUrl} 
+                 alt="Comprobante" 
+                 className="max-w-full max-h-full object-contain rounded-lg shadow-lg" 
+               />
+            </div>
+            
+            {/* Footer / Actions */}
+             <div className="p-4 bg-white border-t border-zinc-100 flex justify-end">
+                <a 
+                  href={currentProofUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-black underline"
+                >
+                  Abrir original en nueva pestaña
+                </a>
+             </div>
           </div>
-        )}
-        {activeTab === 'reportes' && (
-          <div className="py-20 text-center space-y-4">
-             <h2 className="text-5xl font-black italic uppercase opacity-10">Reportes Ejecutivos</h2>
-             <p className="text-zinc-400 font-bold uppercase tracking-widest text-[10px]">Análisis de KPIs y Exportación CSV</p>
-          </div>
-        )}
-      </main>
-
-      <AIAssistant />
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 

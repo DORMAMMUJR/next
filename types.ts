@@ -4,7 +4,8 @@ export enum Role {
   PROFESOR = 'Profesor',
   CONTROL_ESCOLAR = 'Control Escolar',
   FINANZAS = 'Finanzas',
-  DIRECCION = 'Dirección'
+  DIRECCION = 'Dirección',
+  OWNER = 'Dueña' // Nuevo rol de alto nivel
 }
 
 export type AdminSection = 
@@ -17,17 +18,44 @@ export type AdminSection =
   | 'materias' 
   | 'reportes' 
   | 'expedientes' 
-  | 'sedes';
+  | 'sedes'
+  | 'becas'; 
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: string;
+  user_id: string;
+  role: Role;
+  action: 'LOGIN_SUCCESS' | 'PANIC_BUTTON' | 'UNAUTHORIZED_ACCESS';
+  details?: string;
+}
+
+export interface Docente {
+  id: string;
+  nombre_completo: string;
+  sede_slug: string;
+  email: string;
+  especialidad?: string;
+}
 
 export interface Alumno {
   id: string;
   nombre_completo: string;
+  matricula?: string; 
+  fecha_nacimiento?: string; 
+  financial_status?: 'CLEAN' | 'DEBT'; 
   telefono: string;
   email: string;
   generacion: string;
   grupo: string;
   estatus: 'Activo' | 'Baja' | 'Pausa';
   created_at: string;
+  // Relación de datos
+  docente_id?: string; // ID del Docente asignado (Foreign Key)
+  last_homework_date?: string; 
+  calificacion_parcial?: number | null; 
+  asistencias?: number;
+  total_clases?: number;
 }
 
 export interface DocumentoPDF {
@@ -69,6 +97,9 @@ export interface Pago {
   metodo: 'Efectivo' | 'Transferencia' | 'Tarjeta' | 'Otro';
   estatus: 'Pagado' | 'Pendiente' | 'Vencido';
   notas?: string;
+  // Auditoría Dueña
+  proof_url?: string; // URL o Base64 del comprobante
+  verified?: boolean; // Check de la dueña ("Dinero en banco")
 }
 
 export interface City {
@@ -77,6 +108,7 @@ export interface City {
 }
 
 export interface CityData {
+  docentes: Docente[]; // Lista maestra de docentes en esta sede
   alumnos: Alumno[];
   matriculas: Matricula[];
   pagos: Pago[];
