@@ -1,25 +1,25 @@
-
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Configuración para __dirname en ES Modules
+// Configuración de __dirname para ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+// Seenode (y otros hostings) inyectan el puerto en process.env.PORT
 const PORT = process.env.PORT || 3000;
 
-// 1. Servir archivos estáticos desde la carpeta 'dist' (generada por Vite)
+// 1. Servir los archivos estáticos generados por Vite (carpeta dist)
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// 2. SPA Fallback: Cualquier ruta no reconocida por el estático, devuelve index.html
-// Esto permite que React Router maneje las rutas (ej: /login, /alumnos)
+// 2. Manejo de SPA (Single Page Application)
+// Cualquier petición que no coincida con un archivo estático (JS, CSS, Imágenes)
+// se redirige al index.html para que React Router maneje la ruta en el cliente.
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-// 3. Arrancar el servidor
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor de producción corriendo en puerto ${PORT}`);
+  console.log(`🚀 Servidor de producción Next corriendo en puerto ${PORT}`);
 });
