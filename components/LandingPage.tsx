@@ -70,102 +70,11 @@ const LandingPage: React.FC<LoginProps> = ({ onLogin }) => {
     setPanicSent(true);
   };
 
-  const LoginModal = () => {
-    if (loginMode === 'NONE') return null;
-
-    const roleTitle = loginMode === 'STUDENT' ? 'Soy Alumno' : loginMode === 'TEACHER' ? 'Soy Docente' : 'Administración';
-    const roleSubtitle = loginMode === 'STUDENT' ? 'Portal Estudiantil' : loginMode === 'TEACHER' ? 'Claustro Académico' : 'Acceso Restringido';
-    const placeholderID = loginMode === 'STUDENT' ? 'EJ. NX-001023' : loginMode === 'TEACHER' ? 'ID Empleado' : 'ID Usuario';
-    const placeholderPass = loginMode === 'STUDENT' ? 'DDMMAAAA' : 'Contraseña';
-
-    return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setLoginMode('NONE')}></div>
-        <div className="bg-white w-full max-w-md p-8 md:p-12 rounded-[40px] shadow-2xl relative z-10 animate-in zoom-in-95 duration-200 border-2 border-black/5">
-          <button onClick={() => setLoginMode('NONE')} className="absolute top-6 right-6 text-zinc-500 hover:text-black transition-colors font-bold">✕</button>
-          
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-black italic uppercase tracking-tighter mb-2 text-black">{roleTitle}</h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-next-green">{roleSubtitle}</p>
-          </div>
-
-          {debtLock ? (
-             <div className="animate-in fade-in slide-in-from-bottom-4">
-             <div className="bg-red-50 border-l-4 border-red-600 p-6 rounded-r-2xl mb-8 shadow-sm">
-               <h3 className="text-xl font-black italic uppercase text-red-600 mb-2 tracking-tight">Acceso Bloqueado</h3>
-               <p className="text-[10px] font-bold uppercase tracking-wide text-red-900 mb-4">
-                 Se requiere pago inmediato.
-               </p>
-               <div className="text-[10px] text-red-800 font-medium leading-relaxed">
-                 La matrícula <strong>{identifier}</strong> presenta adeudos. Contacta a finanzas.
-               </div>
-             </div>
-             
-             <button onClick={() => setDebtLock(false)} className="w-full bg-zinc-100 text-zinc-800 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-zinc-200 transition-all mb-3">
-               Intentar otra cuenta
-             </button>
- 
-             {!panicSent ? (
-               <button onClick={handlePanicButton} className="w-full bg-red-600 text-white py-4 rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-200">
-                   <span className="text-lg">🚨</span> Reportar pago no reconocido
-               </button>
-             ) : (
-               <div className="bg-green-100 text-green-800 p-4 rounded-2xl text-[10px] font-bold text-center">
-                   ✅ Reporte enviado a Dirección General.
-               </div>
-             )}
-           </div>
-          ) : (
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
-              {errorMsg && (
-                <div className="bg-black text-white p-3 rounded-xl text-[9px] font-bold uppercase tracking-wide text-center animate-pulse">
-                  🚫 {errorMsg}
-                </div>
-              )}
-              <div className="space-y-2">
-                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-600 ml-3">Identificador</label>
-                <input 
-                  type="text" 
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value.toUpperCase())}
-                  placeholder={placeholderID}
-                  className="w-full bg-zinc-50 border-zinc-200 focus:border-next-green focus:bg-white border-2 rounded-2xl px-6 py-4 text-sm font-bold outline-none transition-all placeholder:text-zinc-400 text-black"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-600 ml-3">Clave de Acceso</label>
-                <div className="relative">
-                  <input 
-                    type={loginMode === 'STUDENT' ? "text" : showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={placeholderPass}
-                    className="w-full bg-zinc-50 border-zinc-200 focus:border-next-green focus:bg-white border-2 rounded-2xl px-6 py-4 text-sm font-bold outline-none transition-all placeholder:text-zinc-400 text-black pr-12"
-                  />
-                  {loginMode !== 'STUDENT' && (
-                    <button 
-                      type="button" 
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-black transition-colors"
-                    >
-                      {showPassword ? '👁️' : '🔒'}
-                    </button>
-                  )}
-                </div>
-              </div>
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="w-full bg-black text-white py-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-next-green hover:text-white transition-all shadow-xl mt-4 disabled:opacity-50"
-              >
-                {loading ? 'Verificando...' : 'Acceder'}
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
-    );
-  };
+  // Helper variables for Modal display
+  const roleTitle = loginMode === 'STUDENT' ? 'Soy Alumno' : loginMode === 'TEACHER' ? 'Soy Docente' : 'Administración';
+  const roleSubtitle = loginMode === 'STUDENT' ? 'Portal Estudiantil' : loginMode === 'TEACHER' ? 'Claustro Académico' : 'Acceso Restringido';
+  const placeholderID = loginMode === 'STUDENT' ? 'EJ. NX-001023' : loginMode === 'TEACHER' ? 'ID Empleado' : 'ID Usuario';
+  const placeholderPass = loginMode === 'STUDENT' ? 'DDMMAAAA' : 'Contraseña';
 
   // --- SECTIONS ---
 
@@ -291,7 +200,95 @@ const LandingPage: React.FC<LoginProps> = ({ onLogin }) => {
       {activeSection === 'DOCENTES' && <TeacherSection />}
 
       <Footer />
-      <LoginModal />
+      
+      {/* Login Modal Rendered Inline to prevent re-mounting and focus loss */}
+      {loginMode !== 'NONE' && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setLoginMode('NONE')}></div>
+          <div className="bg-white w-full max-w-md p-8 md:p-12 rounded-[40px] shadow-2xl relative z-10 animate-in zoom-in-95 duration-200 border-2 border-black/5">
+            <button onClick={() => setLoginMode('NONE')} className="absolute top-6 right-6 text-zinc-500 hover:text-black transition-colors font-bold">✕</button>
+            
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-black italic uppercase tracking-tighter mb-2 text-black">{roleTitle}</h2>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-next-green">{roleSubtitle}</p>
+            </div>
+
+            {debtLock ? (
+               <div className="animate-in fade-in slide-in-from-bottom-4">
+               <div className="bg-red-50 border-l-4 border-red-600 p-6 rounded-r-2xl mb-8 shadow-sm">
+                 <h3 className="text-xl font-black italic uppercase text-red-600 mb-2 tracking-tight">Acceso Bloqueado</h3>
+                 <p className="text-[10px] font-bold uppercase tracking-wide text-red-900 mb-4">
+                   Se requiere pago inmediato.
+                 </p>
+                 <div className="text-[10px] text-red-800 font-medium leading-relaxed">
+                   La matrícula <strong>{identifier}</strong> presenta adeudos. Contacta a finanzas.
+                 </div>
+               </div>
+               
+               <button onClick={() => setDebtLock(false)} className="w-full bg-zinc-100 text-zinc-800 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-zinc-200 transition-all mb-3">
+                 Intentar otra cuenta
+               </button>
+   
+               {!panicSent ? (
+                 <button onClick={handlePanicButton} className="w-full bg-red-600 text-white py-4 rounded-2xl font-black uppercase text-[9px] tracking-widest hover:bg-red-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-200">
+                     <span className="text-lg">🚨</span> Reportar pago no reconocido
+                 </button>
+               ) : (
+                 <div className="bg-green-100 text-green-800 p-4 rounded-2xl text-[10px] font-bold text-center">
+                     ✅ Reporte enviado a Dirección General.
+                 </div>
+               )}
+             </div>
+            ) : (
+              <form onSubmit={handleLoginSubmit} className="space-y-4">
+                {errorMsg && (
+                  <div className="bg-black text-white p-3 rounded-xl text-[9px] font-bold uppercase tracking-wide text-center animate-pulse">
+                    🚫 {errorMsg}
+                  </div>
+                )}
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black uppercase tracking-widest text-zinc-600 ml-3">Identificador</label>
+                  <input 
+                    type="text" 
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value.toUpperCase())}
+                    placeholder={placeholderID}
+                    className="w-full bg-zinc-50 border-zinc-200 focus:border-next-green focus:bg-white border-2 rounded-2xl px-6 py-4 text-sm font-bold outline-none transition-all placeholder:text-zinc-400 text-black"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[9px] font-black uppercase tracking-widest text-zinc-600 ml-3">Clave de Acceso</label>
+                  <div className="relative">
+                    <input 
+                      type={loginMode === 'STUDENT' ? "text" : showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder={placeholderPass}
+                      className="w-full bg-zinc-50 border-zinc-200 focus:border-next-green focus:bg-white border-2 rounded-2xl px-6 py-4 text-sm font-bold outline-none transition-all placeholder:text-zinc-400 text-black pr-12"
+                    />
+                    {loginMode !== 'STUDENT' && (
+                      <button 
+                        type="button" 
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-black transition-colors"
+                      >
+                        {showPassword ? '👁️' : '🔒'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="w-full bg-black text-white py-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-next-green hover:text-white transition-all shadow-xl mt-4 disabled:opacity-50"
+                >
+                  {loading ? 'Verificando...' : 'Acceder'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

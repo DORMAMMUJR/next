@@ -247,73 +247,11 @@ const App: React.FC = () => {
     setProofModalOpen(true);
   };
 
-  // --- MODALES Y VISTAS ---
+  // --- FUNCTIONS FOR RENDER (Avoid Nested Components) ---
 
-  const AddStudentModal = () => (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsAddStudentOpen(false)}></div>
-      <div className="bg-white w-full max-w-lg p-8 rounded-[32px] shadow-2xl relative z-10 animate-in zoom-in-95">
-        <button onClick={() => setIsAddStudentOpen(false)} className="absolute top-6 right-6 text-zinc-400 hover:text-black font-bold">✕</button>
-        <h3 className="text-2xl font-black italic uppercase mb-6">Nuevo Alumno<span className="text-next-green">.</span></h3>
-        <form onSubmit={handleAddStudent} className="space-y-4">
-            <div>
-                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Nombre Completo</label>
-                <input required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 uppercase" 
-                    value={newStudent.nombre_completo} onChange={e => setNewStudent({...newStudent, nombre_completo: e.target.value.toUpperCase()})} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Matrícula</label>
-                    <input required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 uppercase" 
-                        value={newStudent.matricula} onChange={e => setNewStudent({...newStudent, matricula: e.target.value.toUpperCase()})} />
-                </div>
-                <div>
-                    <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Password (DDMMAAAA)</label>
-                    <div className="relative">
-                        <input required placeholder="01012000" type={showStudentPassword ? "text" : "password"} className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 pr-10" 
-                            value={newStudent.fecha_nacimiento} onChange={e => setNewStudent({...newStudent, fecha_nacimiento: e.target.value})} />
-                        <button type="button" onClick={() => setShowStudentPassword(!showStudentPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400">
-                             {showStudentPassword ? '👁️' : '🔒'}
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Docente Responsable</label>
-                <select required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1"
-                    value={newStudent.docente_id} onChange={e => setNewStudent({...newStudent, docente_id: e.target.value})}>
-                    <option value="">Seleccionar...</option>
-                    {data.docentes.map(d => (
-                        <option key={d.id} value={d.id}>{d.nombre_completo}</option>
-                    ))}
-                </select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Grupo</label>
-                    <input required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 uppercase" 
-                        value={newStudent.grupo} onChange={e => setNewStudent({...newStudent, grupo: e.target.value.toUpperCase()})} />
-                </div>
-                <div>
-                    <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Generación</label>
-                    <input required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 uppercase" 
-                        value={newStudent.generacion} onChange={e => setNewStudent({...newStudent, generacion: e.target.value.toUpperCase()})} />
-                </div>
-            </div>
-            <button type="submit" className="w-full bg-black text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-next-green transition-colors mt-4">
-                Registrar Alumno
-            </button>
-        </form>
-      </div>
-    </div>
-  );
-
-  const OwnerDashboard = () => {
+  const renderOwnerDashboard = () => {
     if (!currentSlug) return <CampusSelector onSelect={(slug) => { setCurrentSlug(slug); setActiveTab('dashboard'); }} />;
     const totalStudents = data.alumnos.length;
-    
-    // NOTA: El cálculo de ingresos ahora se maneja dinámicamente dentro de AdminAuditTable
-    // pero podemos mantener un "total global" aquí si se desea.
 
     return (
       <div className="space-y-10 animate-in fade-in pb-20">
@@ -338,7 +276,7 @@ const App: React.FC = () => {
     );
   };
 
-  const AuditLogView = () => {
+  const renderAuditLogView = () => {
     return (
       <div className="space-y-8 animate-in fade-in">
         <h2 className="text-4xl font-black italic uppercase tracking-tighter text-black">Bitácora de Accesos <span className="text-next-green">.</span></h2>
@@ -386,7 +324,7 @@ const App: React.FC = () => {
     );
   };
 
-  const TeacherView = () => {
+  const renderTeacherView = () => {
     return (
       <div className="space-y-8 animate-in fade-in">
         <h2 className="text-4xl font-black italic uppercase tracking-tighter text-black">Lista de Calificaciones <span className="text-next-green">.</span></h2>
@@ -420,14 +358,14 @@ const App: React.FC = () => {
     <>
       {activeRole === Role.OWNER && (
         <Layout activeRole={Role.OWNER} onRoleSelect={() => {}} onHome={() => { setCurrentSlug(null); setActiveTab('dashboard'); }} onLogout={() => setShowLogin(true)} onSedes={() => setCurrentSlug(null)} currentAdminSection={activeTab} onAdminSectionChange={(section) => setActiveTab(section)}>
-          {activeTab === 'dashboard' ? <OwnerDashboard /> : 
-           activeTab === 'auditoria' ? <AuditLogView /> :
+          {activeTab === 'dashboard' ? renderOwnerDashboard() : 
+           activeTab === 'auditoria' ? renderAuditLogView() :
            <div className="p-10 text-center font-black uppercase text-zinc-300">Módulo en construcción</div>}
         </Layout>
       )}
       {activeRole === Role.PROFESOR && (
         <Layout activeRole={Role.PROFESOR} onRoleSelect={() => {}} onHome={() => setActiveTab('materias')} onLogout={() => setShowLogin(true)} onSedes={() => {}}>
-          <TeacherView />
+          {renderTeacherView()}
         </Layout>
       )}
       {activeRole === Role.ALUMNO && (
@@ -453,7 +391,66 @@ const App: React.FC = () => {
       )}
       {/* Toast y Modales */}
       {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}
-      {isAddStudentOpen && <AddStudentModal />}
+      
+      {/* ADD STUDENT MODAL INLINE RENDER */}
+      {isAddStudentOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsAddStudentOpen(false)}></div>
+          <div className="bg-white w-full max-w-lg p-8 rounded-[32px] shadow-2xl relative z-10 animate-in zoom-in-95">
+            <button onClick={() => setIsAddStudentOpen(false)} className="absolute top-6 right-6 text-zinc-400 hover:text-black font-bold">✕</button>
+            <h3 className="text-2xl font-black italic uppercase mb-6">Nuevo Alumno<span className="text-next-green">.</span></h3>
+            <form onSubmit={handleAddStudent} className="space-y-4">
+                <div>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Nombre Completo</label>
+                    <input required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 uppercase" 
+                        value={newStudent.nombre_completo} onChange={e => setNewStudent({...newStudent, nombre_completo: e.target.value.toUpperCase()})} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Matrícula</label>
+                        <input required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 uppercase" 
+                            value={newStudent.matricula} onChange={e => setNewStudent({...newStudent, matricula: e.target.value.toUpperCase()})} />
+                    </div>
+                    <div>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Password (DDMMAAAA)</label>
+                        <div className="relative">
+                            <input required placeholder="01012000" type={showStudentPassword ? "text" : "password"} className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 pr-10" 
+                                value={newStudent.fecha_nacimiento} onChange={e => setNewStudent({...newStudent, fecha_nacimiento: e.target.value})} />
+                            <button type="button" onClick={() => setShowStudentPassword(!showStudentPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400">
+                                 {showStudentPassword ? '👁️' : '🔒'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Docente Responsable</label>
+                    <select required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1"
+                        value={newStudent.docente_id} onChange={e => setNewStudent({...newStudent, docente_id: e.target.value})}>
+                        <option value="">Seleccionar...</option>
+                        {data.docentes.map(d => (
+                            <option key={d.id} value={d.id}>{d.nombre_completo}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Grupo</label>
+                        <input required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 uppercase" 
+                            value={newStudent.grupo} onChange={e => setNewStudent({...newStudent, grupo: e.target.value.toUpperCase()})} />
+                    </div>
+                    <div>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Generación</label>
+                        <input required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 uppercase" 
+                            value={newStudent.generacion} onChange={e => setNewStudent({...newStudent, generacion: e.target.value.toUpperCase()})} />
+                    </div>
+                </div>
+                <button type="submit" className="w-full bg-black text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-next-green transition-colors mt-4">
+                    Registrar Alumno
+                </button>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 };
