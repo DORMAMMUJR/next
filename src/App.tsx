@@ -93,13 +93,17 @@ const App: React.FC = () => {
 
   // --- LOGIN ---
   const handleLogin = async (identifier: string, credential: string, role: Role) => {
+    const id = identifier.trim();
+    const pass = credential.trim();
+    console.log("Login attempt:", { role, id, pass });
+
     // ADMIN (Dueña): 1234 / 123
-    if (role === Role.OWNER && identifier === '1234' && credential === '123') {
+    if (role === Role.OWNER && id === '1234' && pass === '123') {
       setActiveRole(Role.OWNER); setShowLogin(false); return { success: true };
     }
 
     // DOCENTE: 1234 / 123 (Testing) o IDs reales
-    if (role === Role.PROFESOR && (identifier === '1234' || identifier.startsWith('doc-')) && credential === '123') {
+    if (role === Role.PROFESOR && (id === '1234' || id.startsWith('doc-')) && pass === '123') {
       setActiveRole(Role.PROFESOR); setShowLogin(false); return { success: true };
     }
 
