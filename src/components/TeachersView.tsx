@@ -23,7 +23,7 @@ const TeachersView: React.FC<TeachersViewProps> = ({ docentes, alumnos, onOpenAd
     // Función auxiliar para obtener una imagen determinista basada en el ID
     const getAvatarUrl = (id: string, gender: 'men' | 'women' = 'men') => {
         // Usamos el último caracter del ID para seleccionar una imagen "aleatoria" pero constante
-        const seed = id.charCodeAt(id.length - 1) % 50;
+        const seed = String(id).charCodeAt(String(id).length - 1) % 50;
         return `https://randomuser.me/api/portraits/${gender}/${seed}.jpg`;
     };
 
