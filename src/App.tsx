@@ -13,9 +13,8 @@ const App: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
   const [activeRole, setActiveRole] = useState<Role | null>(null);
 
-  // NAVEGACIÓN PRINCIPAL
-  // Usamos 'string' para flexibilidad, aunque idealmente sería un tipo union
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  // 2. NUEVO ESTADO PARA CONTROLAR LA NAVEGACIÓN:
+  const [currentView, setCurrentView] = useState<AppView>('dashboard');
 
   // NUEVO: Estado para la Sede Activa
   const [activeSede, setActiveSede] = useState<string>('GENERAL');
@@ -139,12 +138,14 @@ const App: React.FC = () => {
     </div>
   );
 
-  // --- RENDER CONTENIDO CENTRAL ---
+  // 3. FUNCIÓN PARA DECIDIR QUÉ RENDERIZAR SEGÚN LA VISTA ACTUAL:
   const renderContent = () => {
-    if (activeRole === Role.PROFESOR) return <TeacherDashboard />;
+    if (activeRole === Role.PROFESOR) {
+      return <TeacherDashboard />;
+    }
 
-    // Si es DUEÑA, depende del TAB activo
-    switch (activeTab) {
+    // Si es OWNER, dependemos de la vista seleccionada:
+    switch (currentView) {
       case 'dashboard':
         return (
           <OwnerDashboard
@@ -160,12 +161,25 @@ const App: React.FC = () => {
             onOpenAddModal={() => setIsAddModalOpen(true)}
           />
         );
-      case 'docentes':
+      case 'teachers':
         return <TeachersView />;
-      case 'ajustes':
+      case 'settings':
         return <SettingsView />;
       default:
-        return <OwnerDashboard data={filteredData} sedeName={activeSede} onVerifyPayment={() => { }} onOpenAddModal={() => { }} />;
+        return (
+          <OwnerDashboard
+            data={filteredData}
+            sedeName={activeSede}
+            onVerifyPayment={(pagoId, status, alumnoId) => {
+              fetch('/api/pagos/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pagoId, verified: !status, alumnoId, newStatus: !status ? 'CLEAN' : 'DEBT' })
+              }).then(loadData);
+            }}
+            onOpenAddModal={() => setIsAddModalOpen(true)}
+          />
+        );
     }
   };
 
@@ -173,20 +187,16 @@ const App: React.FC = () => {
 
   return (
     <>
+      {/* 4. ACTUALIZA EL LAYOUT PARA PASARLE LA NAVEGACIÓN */}
       <Layout
         activeRole={activeRole}
-        onRoleSelect={() => { }}
-        onHome={() => { }}
-        onLogout={() => setShowLogin(true)}
-
-        // Props de Sede
         activeSede={activeSede}
-        onSedeSelect={setActiveSede}
-
-        // Props de Navegación
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onSedeSelect={(sede) => setActiveSede(sede)}
+        onLogout={() => setShowLogin(true)}
+        currentView={currentView} // <-- NUEVO
+        onNavigate={setCurrentView} // <-- NUEVO: Le pasamos la función para cambiar la vista
       >
+        {/* 5. RENDERIZA EL CONTENIDO DINÁMICO */}
         {renderContent()}
       </Layout>
 
