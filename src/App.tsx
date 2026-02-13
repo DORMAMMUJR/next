@@ -6,6 +6,7 @@ import LandingPage from './components/LandingPage';
 import Layout from './components/Layout';
 import OwnerDashboard from './components/OwnerDashboard';
 import NewStudentModal from './components/NewStudentModal';
+import AddTeacherModal from './components/AddTeacherModal';
 import SafeGradeInput from './components/SafeGradeInput';
 import Toast from './components/Toast';
 import TeachersView from './components/TeachersView';
@@ -51,13 +52,16 @@ const App: React.FC = () => {
         // Creamos 5 a 10 alumnos por maestro
         const numAlumnos = Math.floor(Math.random() * 5) + 5;
         for (let j = 0; j < numAlumnos; j++) {
+          const isDebtor = Math.random() > 0.3 ? false : true;
           alumnos.push({
             id: `alum-${sede}-${i}-${j}`,
             nombre_completo: `Alumno ${j + 1} de ${sede}`,
             matricula: `${sede.substring(0, 3).toUpperCase()}-2026-${i}${j}`,
             docente_id: docId,
-            financial_status: Math.random() > 0.3 ? 'CLEAN' : 'DEBT', // 30% deudores
-            sede: sede
+            financial_status: isDebtor ? 'DEBT' : 'CLEAN',
+            sede: sede,
+            hasReceipt: isDebtor && Math.random() > 0.5, // ~50% de deudores tienen comprobante
+            hasPendingReceipt: isDebtor && Math.random() > 0.5 // ~50% de deudores subieron ticket
           });
         }
       }
@@ -71,8 +75,9 @@ const App: React.FC = () => {
   const [data, setData] = useState<CityData>(generateDummyData());
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-  // ESTADO MODAL (Agregar Alumno)
+  // ESTADO MODAL (Agregar Alumno y Agregar Docente)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isAddTeacherOpen, setIsAddTeacherOpen] = useState(false);
 
   // --- CARGAR DATOS DE LA API ---
   const loadData = () => {
@@ -86,31 +91,32 @@ const App: React.FC = () => {
   };
   useEffect(() => { loadData(); }, []);
 
-  // --- LOGIN (AQUÍ ESTÁ LA CLAVE 1234/123) ---
+  // --- LOGIN ---
   const handleLogin = async (identifier: string, credential: string, role: Role) => {
-
-    // 1. ADMIN / DUEÑA
-    if (role === Role.OWNER) {
-      if (identifier === '1234' && credential === '123') {
-        setActiveRole(Role.OWNER);
-        setShowLogin(false);
-        return { success: true };
-      }
-      return { success: false, error: "Credenciales de Administrador incorrectas" };
+    // ADMIN (Dueña): admin / admin
+    if (role === Role.OWNER && identifier === 'admin' && credential === 'admin') {
+      setActiveRole(Role.OWNER); setShowLogin(false); return { success: true };
     }
 
-    // 2. DOCENTE
-    if (role === Role.PROFESOR) {
-      // Validación simple (En producción podrías checar contra DB)
-      if (identifier.toUpperCase().startsWith('DOC')) {
-        setActiveRole(Role.PROFESOR);
-        setShowLogin(false);
-        return { success: true };
-      }
-      return { success: false, error: "ID Docente no reconocido" };
+    // DOCENTE: 123 / 1234 o cualquier ID que empiece con "doc-"
+    if (role === Role.PROFESOR && (identifier === '123' || identifier.startsWith('doc-')) && credential === '1234') {
+      setActiveRole(Role.PROFESOR); setShowLogin(false); return { success: true };
     }
 
-    return { success: false, error: "Rol no autorizado" };
+    return { success: false, error: "Credenciales inválidas" };
+  };
+
+  // --- HANDLE NEW TEACHER SAVE ---
+  const handleSaveTeacher = (teacherData: any) => {
+    setData(prev => ({
+      ...prev,
+      docentes: [...prev.docentes, {
+        ...teacherData,
+        nombre_completo: teacherData.nombre,
+        sede_slug: teacherData.sede
+      }]
+    }));
+    setToastMsg('✅ Docente registrado exitosamente');
   };
 
   // --- HANDLE NEW STUDENT SAVE ---
@@ -208,7 +214,7 @@ const App: React.FC = () => {
           />
         );
       case 'teachers':
-        return <TeachersView docentes={data.docentes} alumnos={data.alumnos} />;
+        return <TeachersView docentes={data.docentes} alumnos={data.alumnos} onOpenAddTeacher={() => setIsAddTeacherOpen(true)} />;
       case 'settings':
         return (
           <SettingsView
@@ -298,6 +304,13 @@ const App: React.FC = () => {
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleSaveStudent}
         docentes={data.docentes}
+        activeSede={activeSede}
+      />
+
+      <AddTeacherModal
+        isOpen={isAddTeacherOpen}
+        onClose={() => setIsAddTeacherOpen(false)}
+        onSave={handleSaveTeacher}
       />
 
       {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}

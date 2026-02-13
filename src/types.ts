@@ -9,9 +9,15 @@ export type AdminSection = 'dashboard' | 'sedes' | 'materias' | 'auditoria';
 export interface Docente {
   id: string;
   nombre_completo: string;
+  nombre?: string;
   sede_slug: string;
+  sede?: string;
   email?: string;
+  telefono?: string;
   especialidad?: string;
+  alumnos?: number;
+  pagoPendiente?: number;
+  estatus?: string;
 }
 
 export interface Alumno {
@@ -28,6 +34,11 @@ export interface Alumno {
   created_at?: string;
   docente_id?: string;
   calificacion_parcial?: number | null;
+  hasReceipt?: boolean;
+  hasPendingReceipt?: boolean;
+  sede?: string;
+  colegiatura?: string;
+  historial_pagos?: number[];
 }
 
 export interface Pago {

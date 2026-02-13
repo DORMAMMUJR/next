@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CityData } from '../types';
-import { CheckCircle, XCircle, User, AlertTriangle, Lock, ChevronDown, ChevronRight } from 'lucide-react';
+import { CheckCircle, XCircle, User, AlertTriangle, Lock, ChevronDown, ChevronRight, FileText } from 'lucide-react';
+import PaymentReviewModal from './PaymentReviewModal';
 
 interface DashboardProps {
     data: CityData;
@@ -50,6 +51,24 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
 
     const handleCancelPayment = () => {
         setConfirmingPaymentId(null);
+    };
+
+    // Estado para el modal de revisión de comprobante
+    const [reviewAlumno, setReviewAlumno] = useState<any>(null);
+
+    const openReviewModal = (alumno: any) => {
+        setReviewAlumno(alumno);
+    };
+
+    const handleApprovePayment = () => {
+        if (reviewAlumno) {
+            onVerifyPayment('manual', false, reviewAlumno.id);
+            setReviewAlumno(null);
+        }
+    };
+
+    const handleRejectPayment = () => {
+        setReviewAlumno(null);
     };
 
     return (
@@ -199,29 +218,38 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                                                             </td>
                                                             <td className="p-4 text-right">
                                                                 {alumno.financial_status === 'DEBT' ? (
-                                                                    confirmingPaymentId === alumno.id ? (
-                                                                        <div className="flex items-center justify-end gap-2 animate-in fade-in slide-in-from-right-4">
-                                                                            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-tight">¿Confirmar ${COSTO_COLEGIATURA}?</span>
-                                                                            <button
-                                                                                onClick={() => handleConfirmPayment(alumno.id)}
-                                                                                className="bg-green-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-green-600 transition-colors shadow-lg shadow-green-500/20"
-                                                                            >
-                                                                                SÍ
-                                                                            </button>
-                                                                            <button
-                                                                                onClick={handleCancelPayment}
-                                                                                className="bg-zinc-200 text-zinc-500 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-zinc-300 transition-colors"
-                                                                            >
-                                                                                CANCELAR
-                                                                            </button>
-                                                                        </div>
-                                                                    ) : (
+                                                                    (alumno as any).hasReceipt ? (
                                                                         <button
-                                                                            onClick={() => setConfirmingPaymentId(alumno.id)}
-                                                                            className="bg-black text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors shadow-lg shadow-black/10"
+                                                                            onClick={() => openReviewModal(alumno)}
+                                                                            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-500/30 flex items-center gap-2 ml-auto transition-colors"
                                                                         >
-                                                                            Cobrar
+                                                                            <FileText size={12} /> Revisar (1)
                                                                         </button>
+                                                                    ) : (
+                                                                        confirmingPaymentId === alumno.id ? (
+                                                                            <div className="flex items-center justify-end gap-2 animate-in fade-in slide-in-from-right-4">
+                                                                                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-tight">¿Confirmar ${COSTO_COLEGIATURA}?</span>
+                                                                                <button
+                                                                                    onClick={() => handleConfirmPayment(alumno.id)}
+                                                                                    className="bg-green-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-green-600 transition-colors shadow-lg shadow-green-500/20"
+                                                                                >
+                                                                                    SÍ
+                                                                                </button>
+                                                                                <button
+                                                                                    onClick={handleCancelPayment}
+                                                                                    className="bg-zinc-200 text-zinc-500 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-zinc-300 transition-colors"
+                                                                                >
+                                                                                    CANCELAR
+                                                                                </button>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <button
+                                                                                onClick={() => setConfirmingPaymentId(alumno.id)}
+                                                                                className="bg-black text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors shadow-lg shadow-black/10"
+                                                                            >
+                                                                                Cobrar
+                                                                            </button>
+                                                                        )
                                                                     )
                                                                 ) : (
                                                                     <button
@@ -248,6 +276,15 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                     })
                 )}
             </div>
+
+            {/* Modal de Revisión de Comprobante */}
+            <PaymentReviewModal
+                isOpen={!!reviewAlumno}
+                onClose={() => setReviewAlumno(null)}
+                alumno={reviewAlumno}
+                onApprove={handleApprovePayment}
+                onReject={handleRejectPayment}
+            />
         </div>
     );
 };

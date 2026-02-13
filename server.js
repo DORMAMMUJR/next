@@ -81,6 +81,37 @@ app.post('/api/alumnos/grade', async (req, res) => {
   }
 });
 
+// 5. LOGIN REAL CON BASE DE DATOS
+app.post('/api/login', async (req, res) => {
+  const { usuario, password, role } = req.body;
+
+  try {
+    if (role === 'PROFESOR') {
+      // Buscamos en la tabla de docentes
+      const result = await pool.query(
+        'SELECT * FROM docentes WHERE usuario = $1 AND password = $2',
+        [usuario, password]
+      );
+
+      if (result.rows.length > 0) {
+        res.json({ success: true, user: result.rows[0] });
+      } else {
+        res.status(401).json({ success: false, message: "Credenciales de docente inválidas" });
+      }
+    } else {
+      // Lógica para el ADMIN (Dueña)
+      if (usuario === 'admin' && password === 'admin') {
+        res.json({ success: true, role: 'OWNER' });
+      } else {
+        res.status(401).json({ success: false, message: "Admin no reconocido" });
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+});
+
 // FALLBACK
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));

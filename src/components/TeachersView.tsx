@@ -1,13 +1,14 @@
 import React from 'react';
 import { Docente, Alumno } from '../types';
-import { Mail, Phone, Users, MapPin, Search } from 'lucide-react';
+import { Mail, Phone, Users, MapPin, Search, Plus } from 'lucide-react';
 
 interface TeachersViewProps {
     docentes: Docente[];
     alumnos: Alumno[];
+    onOpenAddTeacher?: () => void;
 }
 
-const TeachersView: React.FC<TeachersViewProps> = ({ docentes, alumnos }) => {
+const TeachersView: React.FC<TeachersViewProps> = ({ docentes, alumnos, onOpenAddTeacher }) => {
     const [searchTerm, setSearchTerm] = React.useState('');
 
     const filteredDocentes = docentes.filter(docente =>
@@ -34,6 +35,15 @@ const TeachersView: React.FC<TeachersViewProps> = ({ docentes, alumnos }) => {
                     <h2 className="text-3xl font-black italic uppercase text-zinc-900">Directorio de Docentes</h2>
                     <p className="text-zinc-500 font-medium">Gestiona y contacta al equipo académico.</p>
                 </div>
+
+                {onOpenAddTeacher && (
+                    <button
+                        onClick={onOpenAddTeacher}
+                        className="bg-black text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:scale-105 transition-transform shadow-xl flex items-center gap-2"
+                    >
+                        <Plus size={16} /> Nuevo Docente
+                    </button>
+                )}
 
                 {/* Barra de búsqueda */}
                 <div className="relative group w-full md:w-96">

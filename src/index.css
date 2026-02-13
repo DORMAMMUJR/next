@@ -12,8 +12,9 @@
     }
 
     body {
-        @apply bg-zinc-50 text-zinc-900;
-        /* Texto base más oscuro */
+        /* Usamos un color casi negro para que la letra "pese" */
+        @apply bg-white text-zinc-950 antialiased;
+        font-family: 'Inter', sans-serif;
     }
 
     h1,
@@ -24,6 +25,16 @@
     h6 {
         @apply font-black tracking-tight text-black;
     }
+
+    /* Forzamos que los textos de las tablas sean negros y pesados */
+    td,
+    th {
+        @apply text-zinc-900 font-bold border-b border-zinc-200;
+    }
+}
+
+.heading-professional {
+    @apply font-black italic uppercase tracking-tighter text-black;
 }
 
 @layer components {

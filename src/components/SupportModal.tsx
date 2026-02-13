@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Camera, Mic, Paperclip, MoreVertical, MessageSquare } from 'lucide-react';
+import { X, Send, Image, Mic, Video, MoreVertical, MessageSquare } from 'lucide-react';
 
 interface Message {
     id: number;
@@ -17,7 +17,7 @@ const SupportModal: React.FC<SupportModalProps> = ({ isOpen, onClose }) => {
     const [messages, setMessages] = useState<Message[]>([
         {
             id: 1,
-            text: "¡Hola! 👋 Bienvenido al soporte multimedia. ¿En qué podemos ayudarte hoy?",
+            text: "Hola, ¿cómo puedo ayudarte hoy?",
             sender: 'support',
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
@@ -60,7 +60,7 @@ const SupportModal: React.FC<SupportModalProps> = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed bottom-24 right-6 z-50 w-full max-w-[380px] animate-in slide-in-from-bottom-4 duration-300 ease-out">
-            <div className="bg-white rounded-[32px] overflow-hidden shadow-2xl border border-zinc-100 flex flex-col h-[500px]">
+            <div className="bg-white rounded-[32px] overflow-hidden shadow-2xl border border-zinc-100 flex flex-col h-[520px]">
 
                 {/* Header Superior Estilo Chat */}
                 <div className="bg-black p-6 text-white flex justify-between items-center shrink-0">
@@ -92,18 +92,18 @@ const SupportModal: React.FC<SupportModalProps> = ({ isOpen, onClose }) => {
                 {/* Área de Mensajes */}
                 <div
                     ref={scrollRef}
-                    className="flex-1 overflow-y-auto p-6 space-y-4 bg-zinc-50/50 scroll-smooth"
+                    className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50 scroll-smooth"
                 >
                     {messages.map((msg) => (
                         <div
                             key={msg.id}
                             className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}
                         >
-                            <div className={`max-w-[80%] p-4 rounded-2xl text-sm shadow-sm ${msg.sender === 'user'
-                                    ? 'bg-black text-white rounded-tr-none'
-                                    : 'bg-white border border-zinc-100 text-zinc-800 rounded-tl-none'
+                            <div className={`max-w-[80%] p-3 rounded-2xl text-sm shadow-sm ${msg.sender === 'user'
+                                ? 'bg-black text-white rounded-tr-none'
+                                : 'bg-white border border-zinc-200 text-zinc-800 rounded-tl-none'
                                 }`}>
-                                <p className="font-medium leading-relaxed">{msg.text}</p>
+                                <p className="font-bold leading-relaxed">{msg.text}</p>
                                 <p className={`text-[9px] mt-2 font-bold uppercase tracking-wider ${msg.sender === 'user' ? 'text-zinc-400' : 'text-zinc-400'
                                     }`}>
                                     {msg.timestamp}
@@ -113,35 +113,35 @@ const SupportModal: React.FC<SupportModalProps> = ({ isOpen, onClose }) => {
                     ))}
                 </div>
 
-                {/* Footer Multimedia e Input */}
-                <div className="p-4 bg-white border-t border-zinc-100 space-y-3">
-                    {/* Botones Multimedia */}
-                    <div className="flex items-center gap-2 px-1">
-                        <button className="flex-1 flex items-center justify-center py-2 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 rounded-xl transition-all hover:scale-105 active:scale-95 border border-zinc-100 group" title="Cámara">
-                            <Camera size={18} className="group-hover:text-black transition-colors" />
+                {/* Barra Multimedia e Input */}
+                <div className="p-4 bg-white border-t border-zinc-200">
+                    {/* Iconos Multimedia (Imagen, Audio, Video) */}
+                    <div className="flex gap-4 justify-around mb-3 text-zinc-400">
+                        <button className="hover:text-black transition-colors active:scale-90" title="Enviar Imagen">
+                            <Image size={20} />
                         </button>
-                        <button className="flex-1 flex items-center justify-center py-2 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 rounded-xl transition-all hover:scale-105 active:scale-95 border border-zinc-100 group" title="Audio">
-                            <Mic size={18} className="group-hover:text-black transition-colors" />
+                        <button className="hover:text-black transition-colors active:scale-90" title="Enviar Audio">
+                            <Mic size={20} />
                         </button>
-                        <button className="flex-1 flex items-center justify-center py-2 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 rounded-xl transition-all hover:scale-105 active:scale-95 border border-zinc-100 group" title="Adjuntar">
-                            <Paperclip size={18} className="group-hover:text-black transition-colors" />
+                        <button className="hover:text-black transition-colors active:scale-90" title="Enviar Video">
+                            <Video size={20} />
                         </button>
                     </div>
 
-                    {/* Input de Texto */}
-                    <div className="relative flex items-center gap-2">
+                    {/* Input de Texto + Botón Enviar */}
+                    <div className="flex gap-2">
                         <input
                             type="text"
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                            placeholder="Escribe un mensaje..."
-                            className="w-full bg-zinc-100 border-none rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-black transition-all outline-none pr-12 font-medium"
+                            placeholder="Escribe tu duda..."
+                            className="flex-1 bg-zinc-100 rounded-xl px-4 py-2 font-bold text-sm outline-none focus:ring-2 focus:ring-black transition-all"
                         />
                         <button
                             onClick={handleSend}
                             disabled={!inputValue.trim()}
-                            className="absolute right-2 p-2 bg-black text-white rounded-xl shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
+                            className="bg-black text-white p-2 rounded-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
                         >
                             <Send size={18} />
                         </button>
@@ -160,4 +160,3 @@ const SupportModal: React.FC<SupportModalProps> = ({ isOpen, onClose }) => {
 };
 
 export default SupportModal;
-
