@@ -79,8 +79,10 @@ const StudentUpload: React.FC<StudentUploadProps> = ({ onBack, onUpload }) => {
 
             <div className="w-full max-w-md space-y-8 animate-in slide-in-from-bottom-10">
                 <div className="text-center">
-                    <h1 className="text-4xl font-black italic uppercase tracking-tighter">Portal de Pagos<span className="text-green-500">.</span></h1>
-                    <p className="text-zinc-400 font-bold uppercase tracking-widest text-xs mt-2">Identifícate para continuar</p>
+                    <h1 className="text-4xl font-black italic uppercase tracking-tighter text-zinc-900">Portal de Alumnos<span className="text-green-500">.</span></h1>
+                    <p className="text-zinc-500 font-medium text-sm mt-4 max-w-xs mx-auto leading-relaxed">
+                        Bienvenido. Para subir tu comprobante, primero ingresa tu matrícula para que el sistema te identifique.
+                    </p>
                 </div>
 
                 {/* --- PASO 1: BUSCADOR --- */}
