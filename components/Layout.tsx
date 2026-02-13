@@ -29,15 +29,15 @@ const Layout: React.FC<LayoutProps> = ({
   const isFinanzas = activeRole === Role.FINANZAS;
   const isDireccion = activeRole === Role.DIRECCION;
   const isProfesor = activeRole === Role.PROFESOR;
-  const isOwner = activeRole === Role.OWNER;
-  const isAdminOrStaff = isControl || isFinanzas || isDireccion || isProfesor || isOwner;
+  const isAdmin = activeRole === Role.ADMIN;
+  const isAdminOrStaff = isControl || isFinanzas || isDireccion || isProfesor || isAdmin;
 
   const getAdminMenu = (): { id: AdminSection; label: string; icon: string }[] => {
     const menu: { id: AdminSection; label: string; icon: string }[] = [
-      { id: 'dashboard', label: isOwner ? 'Detector de Riesgos' : 'Dashboard', icon: isOwner ? '🦅' : '📊' },
+      { id: 'dashboard', label: isAdmin ? 'Panel General' : 'Dashboard', icon: isAdmin ? '⚡' : '📊' },
     ];
 
-    if (isOwner) {
+    if (isAdmin) {
        menu.push(
         { id: 'auditoria', label: 'Auditoría Multisede', icon: '🕵️' },
         { id: 'becas', label: 'Aprobación de Becas', icon: '✅' },
@@ -68,7 +68,7 @@ const Layout: React.FC<LayoutProps> = ({
         onHome={onHome}
         isAdminOrStaff={isAdminOrStaff}
         onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        isOwner={isOwner}
+        isOwner={isAdmin}
         onSedes={onSedes}
         activeRole={activeRole}
         onRoleSelect={onRoleSelect}
@@ -91,9 +91,9 @@ const Layout: React.FC<LayoutProps> = ({
               ${isMobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'}
             `}>
               <div className="p-6 md:p-10 space-y-2">
-                <div className={`mb-8 md:mb-10 px-6 py-6 rounded-[28px] md:rounded-[32px] border ${isOwner ? 'bg-black text-white border-black' : 'bg-zinc-50 border-zinc-200'}`}>
-                  <p className={`text-[9px] font-black uppercase tracking-widest mb-2 ${isOwner ? 'text-zinc-500' : 'text-zinc-500'}`}>Panel de Acceso</p>
-                  <p className={`text-sm font-black italic truncate tracking-tighter uppercase ${isOwner ? 'text-white' : 'text-next-green'}`}>{activeRole?.replace('_', ' ')}</p>
+                <div className={`mb-8 md:mb-10 px-6 py-6 rounded-[28px] md:rounded-[32px] border ${isAdmin ? 'bg-black text-white border-black' : 'bg-zinc-50 border-zinc-200'}`}>
+                  <p className={`text-[9px] font-black uppercase tracking-widest mb-2 ${isAdmin ? 'text-zinc-500' : 'text-zinc-500'}`}>Panel de Acceso</p>
+                  <p className={`text-sm font-black italic truncate tracking-tighter uppercase ${isAdmin ? 'text-white' : 'text-next-green'}`}>{activeRole?.replace('_', ' ')}</p>
                 </div>
                 {adminMenu.map((item) => (
                   <button

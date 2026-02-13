@@ -56,7 +56,7 @@ const LandingPage: React.FC<LoginProps> = ({ onLogin }) => {
     // Determine Role based on Login Mode
     let roleToAuth = Role.ALUMNO;
     if (loginMode === 'TEACHER') roleToAuth = Role.PROFESOR;
-    if (loginMode === 'ADMIN') roleToAuth = Role.OWNER; // Or logic for owner/admin
+    if (loginMode === 'ADMIN') roleToAuth = Role.ADMIN; // Updated to ADMIN
 
     // Simulamos delay
     await new Promise(r => setTimeout(r, 800));

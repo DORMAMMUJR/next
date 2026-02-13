@@ -5,7 +5,7 @@ export enum Role {
   CONTROL_ESCOLAR = 'Control Escolar',
   FINANZAS = 'Finanzas',
   DIRECCION = 'Dirección',
-  OWNER = 'Dueña' // Nuevo rol de alto nivel
+  ADMIN = 'Administradora' // Renamed from OWNER
 }
 
 export type AdminSection = 
@@ -91,15 +91,15 @@ export interface Matricula {
 export interface Pago {
   id: string;
   alumno_id: string;
-  concepto: 'Inscripción' | 'Mensualidad' | 'Examen' | 'Otro';
+  concepto: string;
   monto: number;
   fecha_pago: string;
   metodo: 'Efectivo' | 'Transferencia' | 'Tarjeta' | 'Otro';
   estatus: 'Pagado' | 'Pendiente' | 'Vencido';
   notas?: string;
-  // Auditoría Dueña
+  // Auditoría Admin
   proof_url?: string; // URL o Base64 del comprobante
-  verified?: boolean; // Check de la dueña ("Dinero en banco")
+  verified?: boolean; // Check de la admin ("Dinero en banco")
 }
 
 export interface City {

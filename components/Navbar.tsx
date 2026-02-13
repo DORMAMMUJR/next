@@ -15,7 +15,7 @@ interface NavbarProps {
   // Dashboard Specific
   isAdminOrStaff?: boolean;
   onMobileMenuToggle?: () => void;
-  isOwner?: boolean;
+  isOwner?: boolean; // Kept as prop name for compatibility, but represents Admin
   onSedes?: () => void;
   activeRole?: Role | null;
   onRoleSelect?: (role: Role) => void;
@@ -125,7 +125,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
           <Logo />
           <div className="hidden lg:block border-l-2 border-zinc-100 pl-8 ml-4">
             <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-zinc-400">
-              {isOwner ? 'Vista de Auditoría' : 'Bachillerato Ejecutivo Digital'}
+              {isOwner ? 'Panel Administrativo' : 'Bachillerato Ejecutivo Digital'}
             </p>
           </div>
         </div>
@@ -137,7 +137,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
               <div className="flex bg-zinc-100 p-1 rounded-full">
                 <button onClick={() => onRoleSelect(Role.ALUMNO)} className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:bg-white hover:text-black hover:shadow-sm transition-all">Alumnos</button>
                 <button onClick={() => onRoleSelect(Role.PROFESOR)} className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:bg-white hover:text-black hover:shadow-sm transition-all">Docentes</button>
-                <button onClick={() => onRoleSelect(Role.OWNER)} className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:bg-white hover:text-black hover:shadow-sm transition-all">Dueña</button>
+                <button onClick={() => onRoleSelect(Role.ADMIN)} className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:bg-white hover:text-black hover:shadow-sm transition-all">Admin</button>
               </div>
             )}
           </div>

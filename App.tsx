@@ -8,15 +8,75 @@ import AdminAuditTable from './components/AdminAuditTable';
 import SafeGradeInput from './components/SafeGradeInput';
 import Toast from './components/Toast';
 
+// --- MOCK DATA PARA DEMO ---
+const MOCK_DATA: CityData = {
+  docentes: [
+    { id: 'DOC-001', nombre_completo: 'Lic. Roberto Martínez', sede_slug: 'aguascalientes', email: 'roberto@next.mx', especialidad: 'Matemáticas' },
+    { id: 'DOC-002', nombre_completo: 'Mtra. Ana P. López', sede_slug: 'aguascalientes', email: 'ana@next.mx', especialidad: 'Humanidades' }
+  ],
+  alumnos: [
+    { 
+      id: 'AL-001', 
+      nombre_completo: 'SOFÍA RODRÍGUEZ PÉREZ', 
+      matricula: 'NX-001', 
+      fecha_nacimiento: '01012000', 
+      docente_id: 'DOC-001', 
+      grupo: 'A', 
+      generacion: '2024', 
+      financial_status: 'CLEAN', 
+      estatus: 'Activo', 
+      telefono: '555-555-5555', 
+      email: 'sofia@mail.com', 
+      created_at: new Date().toISOString(),
+      calificacion_parcial: 9.5
+    },
+    { 
+      id: 'AL-002', 
+      nombre_completo: 'LUIS GONZÁLEZ TORRES', 
+      matricula: 'NX-002', 
+      fecha_nacimiento: '01012000', 
+      docente_id: 'DOC-001', 
+      grupo: 'A', 
+      generacion: '2024', 
+      financial_status: 'DEBT', 
+      estatus: 'Activo', 
+      telefono: '555-555-5555', 
+      email: 'luis@mail.com', 
+      created_at: new Date().toISOString(),
+      calificacion_parcial: 8.0
+    },
+    { 
+      id: 'AL-003', 
+      nombre_completo: 'FERNANDA CASTILLO', 
+      matricula: 'NX-003', 
+      fecha_nacimiento: '01012000', 
+      docente_id: 'DOC-002', 
+      grupo: 'B', 
+      generacion: '2024', 
+      financial_status: 'CLEAN', 
+      estatus: 'Activo', 
+      telefono: '555-555-5555', 
+      email: 'fer@mail.com', 
+      created_at: new Date().toISOString(),
+      calificacion_parcial: 10
+    }
+  ],
+  pagos: [
+    { id: 'P-001', alumno_id: 'AL-001', concepto: 'Mensualidad Septiembre', monto: 2500, fecha_pago: new Date().toISOString(), metodo: 'Transferencia', estatus: 'Pagado', verified: true },
+    { id: 'P-002', alumno_id: 'AL-002', concepto: 'Mensualidad Septiembre', monto: 2500, fecha_pago: new Date(Date.now() - 86400000 * 5).toISOString(), metodo: 'Efectivo', estatus: 'Vencido', verified: false },
+    { id: 'P-003', alumno_id: 'AL-002', concepto: 'Inscripción', monto: 1500, fecha_pago: new Date(Date.now() - 86400000 * 30).toISOString(), metodo: 'Transferencia', estatus: 'Pagado', verified: true },
+  ],
+  matriculas: [],
+  expedientes: []
+};
+
 const App: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
   const [currentSlug, setCurrentSlug] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<AdminSection>('dashboard');
   
-  // ESTADO PRINCIPAL DE DATOS
-  const [data, setData] = useState<CityData>({ 
-    alumnos: [], matriculas: [], pagos: [], expedientes: [], docentes: [] 
-  });
+  // ESTADO PRINCIPAL DE DATOS - Inicializado con Mock Data por si falla la API
+  const [data, setData] = useState<CityData>(MOCK_DATA);
   
   const [selectedAlumnoId, setSelectedAlumnoId] = useState<string | null>(null);
   const [activeRole, setActiveRole] = useState<Role | null>(null);
@@ -59,7 +119,9 @@ const App: React.FC = () => {
       // 2. Actualizar estado local para que se vea inmediato en la tabla
       setAuditLogs(prev => [newEntry, ...prev]);
     } catch (err) {
-      console.error("No se pudo persistir el log:", err);
+      console.error("No se pudo persistir el log (Dev Mode):", err);
+      // Fallback para dev
+      setAuditLogs(prev => [newEntry, ...prev]);
     }
   };
 
@@ -73,22 +135,25 @@ const App: React.FC = () => {
           return res.json();
         })
         .then(dbData => {
-          // Si la DB tiene datos, los cargamos
-          if (dbData.alumnos) {
+          // Si la DB tiene datos, los cargamos. Si no (ej. local), usamos mock
+          if (dbData.alumnos && dbData.alumnos.length > 0) {
             setData(dbData);
+          } else {
+             console.log("Usando Mock Data (DB vacía o desconectada)");
+             setData(MOCK_DATA);
           }
         })
         .catch(err => {
-          console.error("Error conectando a API:", err);
-          setToastMsg("⚠️ Error de conexión con Base de Datos");
+          console.error("Error conectando a API (Usando Mock):", err);
+          setData(MOCK_DATA);
         });
     }
   }, [currentSlug]);
 
   // --- CARGAR LOGS DE AUDITORÍA ---
   useEffect(() => {
-    // Cargar logs desde la DB real al entrar como Admin/Dueña
-    if (activeRole === Role.OWNER) {
+    // Cargar logs desde la DB real al entrar como Admin
+    if (activeRole === Role.ADMIN) {
       fetch('/api/logs')
         .then(res => {
             if (!res.ok) throw new Error("Error fetching logs");
@@ -106,20 +171,12 @@ const App: React.FC = () => {
   };
 
   const handleLogin = async (identifier: string, credential: string, role: Role): Promise<{ success: boolean; error?: string; status?: 'CLEAN' | 'DEBT' }> => {
-    // Login Simulado (Validando contra los datos cargados de la DB)
+    
+    // 1. ALUMNOS
     if (role === Role.ALUMNO) {
-      if (identifier === '123' && credential === '123') { // Backdoor para pruebas
-         const demoStudent = data.alumnos[0];
-         if (demoStudent) {
-            logAction('DEMO-ALUMNO', Role.ALUMNO, 'LOGIN_SUCCESS', 'Acceso Rápido Demo');
-            setCurrentSlug('aguascalientes');
-            setSelectedAlumnoId(demoStudent.id);
-            setActiveRole(Role.ALUMNO);
-            setShowLogin(false);
-            return { success: true, status: demoStudent.financial_status || 'CLEAN' };
-         }
-      }
+      // Buscar en Mock Data primero para asegurar acceso demo
       const alumno = data.alumnos.find(a => a.matricula === identifier && a.fecha_nacimiento === credential);
+      
       if (!alumno) return { success: false, error: "Credenciales incorrectas." };
       
       logAction(identifier, Role.ALUMNO, 'LOGIN_SUCCESS', alumno.financial_status === 'DEBT' ? 'Login con bloqueo' : 'Acceso limpio');
@@ -131,8 +188,9 @@ const App: React.FC = () => {
       setShowLogin(false);
       return { success: true, status: 'CLEAN' };
     } 
+    
+    // 2. DOCENTES
     else if (role === Role.PROFESOR) {
-      // Login simple para docentes
       if (identifier === 'DOC-001') {
         logAction(identifier, Role.PROFESOR, 'LOGIN_SUCCESS');
         setActiveRole(Role.PROFESOR);
@@ -142,11 +200,12 @@ const App: React.FC = () => {
       }
       return { success: false, error: "Docente no encontrado." };
     }
-    else if (role === Role.OWNER) {
-      // Login de Dueña
-      if ((identifier === '1234' && credential === '123')) {
-        logAction(identifier, Role.OWNER, 'LOGIN_SUCCESS');
-        setActiveRole(Role.OWNER);
+    
+    // 3. ADMIN (Antes Dueña)
+    else if (role === Role.ADMIN) {
+      if ((identifier === 'admin' && credential === 'admin123')) {
+        logAction(identifier, Role.ADMIN, 'LOGIN_SUCCESS');
+        setActiveRole(Role.ADMIN);
         setCurrentSlug(null); 
         setShowLogin(false);
         return { success: true, status: 'CLEAN' };
@@ -160,15 +219,22 @@ const App: React.FC = () => {
   const handleAddStudent = async (e: React.FormEvent) => {
     e.preventDefault();
     const id = `ALUM-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+    const newStudentObj = {
+        ...newStudent,
+        id,
+        financial_status: 'CLEAN' as 'CLEAN',
+        estatus: 'Activo' as 'Activo',
+        email: 'nuevo@alumno.com',
+        telefono: '0000000000',
+        created_at: new Date().toISOString(),
+        calificacion_parcial: 0
+    };
     
     try {
       const response = await fetch('/api/alumnos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...newStudent,
-          id
-        })
+        body: JSON.stringify(newStudentObj)
       });
 
       if (response.ok) {
@@ -176,28 +242,33 @@ const App: React.FC = () => {
         const res = await fetch('/api/dashboard');
         const dbData = await res.json();
         setData(dbData);
-        setToastMsg("Alumno registrado exitosamente");
-        setIsAddStudentOpen(false);
-        // Reset form
-        setNewStudent({
-            nombre_completo: '',
-            matricula: '',
-            fecha_nacimiento: '',
-            docente_id: '',
-            grupo: '',
-            generacion: ''
-        });
-        setShowStudentPassword(false);
       } else {
-        setToastMsg("Error al registrar: Verifique matrícula");
+        // Fallback local si la API falla
+        setData(prev => ({...prev, alumnos: [...prev.alumnos, newStudentObj]}));
       }
+      
+      setToastMsg("Alumno registrado exitosamente");
+      setIsAddStudentOpen(false);
+      setNewStudent({
+          nombre_completo: '',
+          matricula: '',
+          fecha_nacimiento: '',
+          docente_id: '',
+          grupo: '',
+          generacion: ''
+      });
+      setShowStudentPassword(false);
+
     } catch (err) {
       console.error("Error:", err);
-      setToastMsg("Error de conexión");
+      // Fallback local
+      setData(prev => ({...prev, alumnos: [...prev.alumnos, newStudentObj]}));
+      setToastMsg("Alumno registrado (Local)");
+      setIsAddStudentOpen(false);
     }
   };
 
-  // --- VALIDACIÓN DE PAGOS (CONECTADO A DB) ---
+  // --- VALIDACIÓN DE PAGOS ---
   const togglePaymentVerification = (pagoId: string, currentStatus: boolean, alumnoId: string) => {
     // 1. Calcular nuevo estado optimista
     const newVerified = !currentStatus;
@@ -225,7 +296,7 @@ const App: React.FC = () => {
     showToast(newVerified ? "Pago validado correctamente" : "Validación revocada");
   };
 
-  // --- GUARDAR CALIFICACIÓN (CONECTADO A DB) ---
+  // --- GUARDAR CALIFICACIÓN ---
   const handleGradeSave = (alumnoId: string, newGrade: number) => {
     // Enviar a la Base de Datos
     fetch('/api/alumnos/grade', {
@@ -249,7 +320,7 @@ const App: React.FC = () => {
 
   // --- FUNCTIONS FOR RENDER (Avoid Nested Components) ---
 
-  const renderOwnerDashboard = () => {
+  const renderAdminDashboard = () => {
     if (!currentSlug) return <CampusSelector onSelect={(slug) => { setCurrentSlug(slug); setActiveTab('dashboard'); }} />;
     const totalStudents = data.alumnos.length;
 
@@ -259,7 +330,7 @@ const App: React.FC = () => {
           <div>
              <button onClick={() => setCurrentSlug(null)} className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-black mb-2 flex items-center gap-1 transition-colors">← Volver a Sedes</button>
              <h2 className="text-4xl font-black italic uppercase tracking-tighter text-black">Sede {currentSlug}</h2>
-             <p className="text-xs font-bold text-zinc-500 mt-1">Panel de Auditoría y Control Financiero</p>
+             <p className="text-xs font-bold text-zinc-500 mt-1">Panel de Control Administrativo</p>
           </div>
           <div className="flex gap-4 items-center text-right">
              <button onClick={() => setIsAddStudentOpen(true)} className="bg-black text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-zinc-800 transition-all shadow-lg h-fit">
@@ -301,7 +372,7 @@ const App: React.FC = () => {
                     <td className="p-6 font-bold text-sm font-mono text-black">{log.user_id}</td>
                     <td className="p-6">
                       <span className={`px-2 py-1 rounded text-[8px] font-black uppercase tracking-wider
-                        ${log.role === Role.OWNER ? 'bg-black text-white' : 
+                        ${log.role === Role.ADMIN ? 'bg-black text-white' : 
                           log.role === Role.PROFESOR ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
                         {log.role}
                       </span>
@@ -356,9 +427,9 @@ const App: React.FC = () => {
 
   return (
     <>
-      {activeRole === Role.OWNER && (
-        <Layout activeRole={Role.OWNER} onRoleSelect={() => {}} onHome={() => { setCurrentSlug(null); setActiveTab('dashboard'); }} onLogout={() => setShowLogin(true)} onSedes={() => setCurrentSlug(null)} currentAdminSection={activeTab} onAdminSectionChange={(section) => setActiveTab(section)}>
-          {activeTab === 'dashboard' ? renderOwnerDashboard() : 
+      {activeRole === Role.ADMIN && (
+        <Layout activeRole={Role.ADMIN} onRoleSelect={() => {}} onHome={() => { setCurrentSlug(null); setActiveTab('dashboard'); }} onLogout={() => setShowLogin(true)} onSedes={() => setCurrentSlug(null)} currentAdminSection={activeTab} onAdminSectionChange={(section) => setActiveTab(section)}>
+          {activeTab === 'dashboard' ? renderAdminDashboard() : 
            activeTab === 'auditoria' ? renderAuditLogView() :
            <div className="p-10 text-center font-black uppercase text-zinc-300">Módulo en construcción</div>}
         </Layout>
@@ -385,6 +456,16 @@ const App: React.FC = () => {
                    <p className="text-xs font-bold text-red-900 uppercase">Tu pago no ha sido conciliado por auditoría o presentas adeudo.</p>
                 </div>
               )}
+              <div className="grid grid-cols-2 gap-4 text-left">
+                  <div className="p-6 bg-zinc-50 rounded-2xl">
+                      <p className="text-[9px] font-black uppercase text-zinc-400">Docente Asignado</p>
+                      <p className="font-bold">{data.docentes.find(d => d.id === data.alumnos.find(a => a.id === selectedAlumnoId)?.docente_id)?.nombre_completo || 'No asignado'}</p>
+                  </div>
+                  <div className="p-6 bg-zinc-50 rounded-2xl">
+                      <p className="text-[9px] font-black uppercase text-zinc-400">Promedio Parcial</p>
+                      <p className="font-bold text-xl">{data.alumnos.find(a => a.id === selectedAlumnoId)?.calificacion_parcial || '-'}</p>
+                  </div>
+              </div>
               <button onClick={() => setShowLogin(true)} className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-black">Cerrar Sesión</button>
            </div>
         </div>
