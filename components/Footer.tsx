@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 const Footer: React.FC = () => {
@@ -31,9 +30,14 @@ const Footer: React.FC = () => {
         </div>
       </div>
       <div className="border-t border-zinc-900 pt-8 text-center">
-        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">
-          Desarrollado por Falla Intecnia © 2026
-        </p>
+        <a 
+          href="https://intecnia-final.vercel.app/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-next-green transition-colors"
+        >
+          BY INTECNIA
+        </a>
       </div>
     </footer>
   );
