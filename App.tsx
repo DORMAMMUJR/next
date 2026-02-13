@@ -27,6 +27,7 @@ const App: React.FC = () => {
 
   // --- ADD STUDENT STATE ---
   const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+  const [showStudentPassword, setShowStudentPassword] = useState(false); // Toggle
   const [newStudent, setNewStudent] = useState({
     nombre_completo: '',
     matricula: '',
@@ -183,6 +184,7 @@ const App: React.FC = () => {
             grupo: '',
             generacion: ''
         });
+        setShowStudentPassword(false);
       } else {
         setToastMsg("Error al registrar: Verifique matrícula");
       }
@@ -264,8 +266,13 @@ const App: React.FC = () => {
                 </div>
                 <div>
                     <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Password (DDMMAAAA)</label>
-                    <input required placeholder="01012000" className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1" 
-                        value={newStudent.fecha_nacimiento} onChange={e => setNewStudent({...newStudent, fecha_nacimiento: e.target.value})} />
+                    <div className="relative">
+                        <input required placeholder="01012000" type={showStudentPassword ? "text" : "password"} className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 pr-10" 
+                            value={newStudent.fecha_nacimiento} onChange={e => setNewStudent({...newStudent, fecha_nacimiento: e.target.value})} />
+                        <button type="button" onClick={() => setShowStudentPassword(!showStudentPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400">
+                             {showStudentPassword ? '👁️' : '🔒'}
+                        </button>
+                    </div>
                 </div>
             </div>
             <div>
@@ -301,7 +308,9 @@ const App: React.FC = () => {
   const OwnerDashboard = () => {
     if (!currentSlug) return <CampusSelector onSelect={(slug) => { setCurrentSlug(slug); setActiveTab('dashboard'); }} />;
     const totalStudents = data.alumnos.length;
-    const totalVerifiedIncome = data.pagos.filter(p => p.estatus === 'Pagado' && p.verified).reduce((acc, curr) => acc + Number(curr.monto), 0);
+    
+    // NOTA: El cálculo de ingresos ahora se maneja dinámicamente dentro de AdminAuditTable
+    // pero podemos mantener un "total global" aquí si se desea.
 
     return (
       <div className="space-y-10 animate-in fade-in pb-20">
@@ -318,10 +327,6 @@ const App: React.FC = () => {
              <div className="bg-zinc-50 px-6 py-3 rounded-2xl border border-zinc-100">
                 <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Alumnos Activos</p>
                 <p className="text-2xl font-black">{totalStudents}</p>
-             </div>
-             <div className="bg-zinc-50 px-6 py-3 rounded-2xl border border-zinc-100">
-                <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Ingreso Validado</p>
-                <p className="text-2xl font-black text-next-green font-mono">${totalVerifiedIncome.toLocaleString()}</p>
              </div>
           </div>
         </div>

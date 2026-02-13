@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Role } from '../types';
 import Navbar from './Navbar';
@@ -22,6 +21,7 @@ const LandingPage: React.FC<LoginProps> = ({ onLogin }) => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [debtLock, setDebtLock] = useState(false);
   const [panicSent, setPanicSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State for toggle
 
   // --- NAVIGATION HANDLERS ---
   const scrollToSection = (section: PortalSection) => {
@@ -37,6 +37,7 @@ const LandingPage: React.FC<LoginProps> = ({ onLogin }) => {
     setErrorMsg(null);
     setDebtLock(false);
     setPanicSent(false);
+    setShowPassword(false);
   };
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -133,14 +134,25 @@ const LandingPage: React.FC<LoginProps> = ({ onLogin }) => {
               </div>
               <div className="space-y-2">
                 <label className="text-[9px] font-black uppercase tracking-widest text-zinc-600 ml-3">Clave de Acceso</label>
-                <input 
-                  type={loginMode === 'STUDENT' ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(loginMode === 'STUDENT' ? e.target.value.replace(/[^0-9]/g, '') : e.target.value)}
-                  placeholder={placeholderPass}
-                  maxLength={loginMode === 'STUDENT' ? 8 : undefined}
-                  className="w-full bg-zinc-50 border-zinc-200 focus:border-next-green focus:bg-white border-2 rounded-2xl px-6 py-4 text-sm font-bold outline-none transition-all placeholder:text-zinc-400 text-black"
-                />
+                <div className="relative">
+                  <input 
+                    type={loginMode === 'STUDENT' ? "text" : showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(loginMode === 'STUDENT' ? e.target.value.replace(/[^0-9]/g, '') : e.target.value)}
+                    placeholder={placeholderPass}
+                    maxLength={loginMode === 'STUDENT' ? 8 : undefined}
+                    className="w-full bg-zinc-50 border-zinc-200 focus:border-next-green focus:bg-white border-2 rounded-2xl px-6 py-4 text-sm font-bold outline-none transition-all placeholder:text-zinc-400 text-black pr-12"
+                  />
+                  {loginMode !== 'STUDENT' && (
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-black transition-colors"
+                    >
+                      {showPassword ? '👁️' : '🔒'}
+                    </button>
+                  )}
+                </div>
                 {loginMode === 'STUDENT' && <p className="text-[8px] text-right text-zinc-500 font-bold uppercase tracking-wide pr-2">Formato: 8 Dígitos (DDMMAAAA)</p>}
               </div>
               <button 
