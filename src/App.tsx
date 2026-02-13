@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Role, AdminSection, CityData } from './types';
+import { Role, AdminSection, CityData, AppView } from './types';
 import LandingPage from './components/LandingPage';
 import Layout from './components/Layout';
 import OwnerDashboard from './components/OwnerDashboard';
 import NewStudentModal from './components/NewStudentModal';
 import SafeGradeInput from './components/SafeGradeInput';
 import Toast from './components/Toast';
+import TeachersView from './components/TeachersView';
+import SettingsView from './components/SettingsView';
 
 const App: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
   const [activeRole, setActiveRole] = useState<Role | null>(null);
-  const [activeTab, setActiveTab] = useState<AdminSection>('dashboard');
+
+  // NAVEGACIÓN PRINCIPAL
+  // Usamos 'string' para flexibilidad, aunque idealmente sería un tipo union
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
 
   // NUEVO: Estado para la Sede Activa
   const [activeSede, setActiveSede] = useState<string>('GENERAL');
@@ -93,14 +98,11 @@ const App: React.FC = () => {
     const docenteIds = docentesSede.map(d => d.id);
 
     // 2. Filtramos alumnos asignados a esos docentes
-    // NOTA: Si un alumno no tiene docente, no saldrá en la vista filtrada (o lo puedes manejar aparte)
     const alumnosSede = data.alumnos.filter(a => a.docente_id && docenteIds.includes(a.docente_id));
 
     return {
       ...data,
       alumnos: alumnosSede,
-      // Opcional: filtrar docentes también si quieres que baje solo la lista de esa sede
-      // docentes: docentesSede 
     };
   };
 
@@ -137,25 +139,17 @@ const App: React.FC = () => {
     </div>
   );
 
-  if (showLogin) return <LandingPage onLogin={handleLogin} />;
+  // --- RENDER CONTENIDO CENTRAL ---
+  const renderContent = () => {
+    if (activeRole === Role.PROFESOR) return <TeacherDashboard />;
 
-  return (
-    <>
-      <Layout
-        activeRole={activeRole}
-        onRoleSelect={() => { }} // Ya no se usa tanto en el nuevo layout pero lo dejamos por compatibilidad
-        onHome={() => { }}
-        onLogout={() => setShowLogin(true)}
-        activeSede={activeSede}
-        onSedeSelect={setActiveSede}
-        // Props opcionales que estaban antes
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      >
-        {activeRole === Role.OWNER ? (
+    // Si es DUEÑA, depende del TAB activo
+    switch (activeTab) {
+      case 'dashboard':
+        return (
           <OwnerDashboard
-            data={filteredData} // <--- PASAMOS DATA FILTRADA
-            sedeName={activeSede} // <--- PASAMOS NOMBRE DE SEDE
+            data={filteredData}
+            sedeName={activeSede}
             onVerifyPayment={(pagoId, status, alumnoId) => {
               fetch('/api/pagos/verify', {
                 method: 'POST',
@@ -165,9 +159,35 @@ const App: React.FC = () => {
             }}
             onOpenAddModal={() => setIsAddModalOpen(true)}
           />
-        ) : (
-          <TeacherDashboard />
-        )}
+        );
+      case 'docentes':
+        return <TeachersView />;
+      case 'ajustes':
+        return <SettingsView />;
+      default:
+        return <OwnerDashboard data={filteredData} sedeName={activeSede} onVerifyPayment={() => { }} onOpenAddModal={() => { }} />;
+    }
+  };
+
+  if (showLogin) return <LandingPage onLogin={handleLogin} />;
+
+  return (
+    <>
+      <Layout
+        activeRole={activeRole}
+        onRoleSelect={() => { }}
+        onHome={() => { }}
+        onLogout={() => setShowLogin(true)}
+
+        // Props de Sede
+        activeSede={activeSede}
+        onSedeSelect={setActiveSede}
+
+        // Props de Navegación
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      >
+        {renderContent()}
       </Layout>
 
       <NewStudentModal

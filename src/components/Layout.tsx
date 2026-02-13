@@ -9,15 +9,36 @@ interface LayoutProps {
   activeSede: string;
   onSedeSelect: (sede: string) => void;
   onLogout: () => void;
-  // Make these optional since the user's snippet doesn't include them but App.tsx might still pass them
+  // --- NEW: Navigation Props ---
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
+  // Others kept for compatibility if needed
   onRoleSelect?: (role: Role) => void;
   onHome?: () => void;
   onSedes?: () => void;
-  activeTab?: any;
-  onTabChange?: (tab: any) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, activeRole, activeSede, onSedeSelect, onLogout }) => {
+const Layout: React.FC<LayoutProps> = ({
+  children, activeRole, activeSede, onSedeSelect, onLogout,
+  activeTab = 'dashboard', onTabChange
+}) => {
+
+  const NavButton = ({ id, icon: Icon, label }: { id: string, icon: any, label: string }) => {
+    const isActive = activeTab === id;
+    return (
+      <button
+        onClick={() => onTabChange && onTabChange(id)}
+        className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all ${isActive
+            ? 'bg-black text-white shadow-lg shadow-black/20'
+            : 'text-zinc-400 hover:bg-zinc-50 hover:text-black'
+          }`}
+      >
+        <Icon size={20} />
+        <span className="text-xs font-bold uppercase tracking-widest hidden md:block">{label}</span>
+      </button>
+    );
+  };
+
   return (
     <div className="flex min-h-screen bg-zinc-50 font-sans">
 
@@ -29,18 +50,9 @@ const Layout: React.FC<LayoutProps> = ({ children, activeRole, activeSede, onSed
           </div>
 
           <nav className="p-4 space-y-2 mt-4">
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-xl bg-black text-white shadow-lg shadow-black/20 transition-all">
-              <LayoutDashboard size={20} />
-              <span className="text-xs font-bold uppercase tracking-widest hidden md:block">Dashboard</span>
-            </button>
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-xl text-zinc-400 hover:bg-zinc-50 hover:text-black transition-all">
-              <Users size={20} />
-              <span className="text-xs font-bold uppercase tracking-widest hidden md:block">Docentes</span>
-            </button>
-            <button className="w-full flex items-center gap-4 px-4 py-4 rounded-xl text-zinc-400 hover:bg-zinc-50 hover:text-black transition-all">
-              <Settings size={20} />
-              <span className="text-xs font-bold uppercase tracking-widest hidden md:block">Ajustes</span>
-            </button>
+            <NavButton id="dashboard" icon={LayoutDashboard} label="Dashboard" />
+            <NavButton id="docentes" icon={Users} label="Docentes" />
+            <NavButton id="ajustes" icon={Settings} label="Ajustes" />
           </nav>
         </div>
 

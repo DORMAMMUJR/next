@@ -19,7 +19,7 @@ export interface Alumno {
   nombre_completo: string;
   matricula: string;
   fecha_nacimiento?: string;
-  financial_status: 'CLEAN' | 'DEBT'; 
+  financial_status: 'CLEAN' | 'DEBT';
   telefono?: string;
   email?: string;
   generacion?: string;
@@ -63,3 +63,6 @@ export interface City {
   name: string;
   slug: string;
 }
+
+// Define las secciones principales de la app
+export type AppView = 'dashboard' | 'teachers' | 'settings';
