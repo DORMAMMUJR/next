@@ -1,108 +1,173 @@
 import React from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Users, DollarSign, AlertCircle, TrendingUp } from 'lucide-react';
-import AdminAuditTable from './AdminAuditTable';
 import { CityData } from '../types';
+import { CheckCircle, XCircle, CreditCard, User, AlertTriangle, TrendingUp, Lock } from 'lucide-react';
 
 interface DashboardProps {
     data: CityData;
+    sedeName: string;
     onVerifyPayment: (pagoId: string, status: boolean, alumnoId: string) => void;
     onOpenAddModal: () => void;
 }
 
-const OwnerDashboard: React.FC<DashboardProps> = ({ data, onVerifyPayment, onOpenAddModal }) => {
-    // Cálculos Reales
-    const totalAlumnos = data.alumnos.length;
-    const deudores = data.alumnos.filter(a => a.financial_status === 'DEBT').length;
-    const alCorriente = totalAlumnos - deudores;
-    const ingresoEstimado = alCorriente * 1500; // Ejemplo: $1500 por colegiatura
+const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPayment, onOpenAddModal }) => {
+    // --- LÓGICA ANTI-ROBO ---
+    const COSTO_COLEGIATURA = 1500; // Ajusta este valor al precio real o hazlo dinámico después
 
-    // Datos para la gráfica (Simulados para el demo visual)
-    const chartData = [
-        { name: 'Sem 1', ingresos: 4000 },
-        { name: 'Sem 2', ingresos: 3000 },
-        { name: 'Sem 3', ingresos: ingresoEstimado },
-        { name: 'Sem 4', ingresos: ingresoEstimado + 2000 },
-    ];
+    const totalAlumnos = data.alumnos.length;
+    const conDeuda = data.alumnos.filter(a => a.financial_status === 'DEBT').length;
+    const alCorriente = totalAlumnos - conDeuda;
+
+    // DINERO:
+    const dineroReunido = alCorriente * COSTO_COLEGIATURA; // Lo que ya entró a caja
+    const dineroFaltante = conDeuda * COSTO_COLEGIATURA;   // Lo que falta por entrar (o lo que se están robando si no reportan)
+    const dineroTotalEsperado = totalAlumnos * COSTO_COLEGIATURA; // El potencial máximo
+
+    // Porcentaje de Recaudación
+    const porcentajeCobrado = totalAlumnos > 0 ? Math.round((alCorriente / totalAlumnos) * 100) : 0;
 
     return (
         <div className="space-y-8 animate-in fade-in pb-20 max-w-7xl mx-auto">
-            {/* Encabezado */}
-            <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-zinc-100 pb-6">
+
+            {/* 1. Encabezado */}
+            <div className="flex flex-col md:flex-row justify-between items-end gap-6">
                 <div>
-                    <h2 className="text-4xl font-black italic uppercase tracking-tighter">Dashboard<span className="text-green-500">.</span></h2>
-                    <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Resumen Financiero & Académico</p>
+                    <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest bg-zinc-100 px-3 py-1 rounded-full">
+                        Sede: {sedeName}
+                    </span>
+                    <h2 className="text-4xl mt-4 font-black italic uppercase tracking-tighter">
+                        Panel de Control<span className="text-green-500">.</span>
+                    </h2>
                 </div>
                 <button
                     onClick={onOpenAddModal}
-                    className="bg-black text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:scale-105 transition-transform flex items-center gap-2 shadow-xl shadow-black/10"
+                    className="bg-black text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:scale-105 transition-transform shadow-xl"
                 >
-                    <Users size={16} /> Nuevo Alumno
+                    + Nuevo Alumno
                 </button>
             </div>
 
-            {/* Tarjetas de Estadísticas (Stat Cards) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl border border-zinc-100 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 bg-zinc-50 rounded-xl"><Users className="text-black" size={24} /></div>
-                        <span className="text-[10px] font-black uppercase text-zinc-400 bg-zinc-50 px-2 py-1 rounded">Total Activos</span>
-                    </div>
-                    <p className="text-4xl font-black tracking-tighter">{totalAlumnos}</p>
-                    <p className="text-xs text-zinc-400 mt-1 font-bold">Matrícula General</p>
-                </div>
+            {/* 2. ✨ LA HERRAMIENTA EXTRA: AUDITORÍA FINANCIERA ✨ */}
+            <div className="bg-zinc-900 text-white p-8 rounded-[32px] relative overflow-hidden shadow-2xl shadow-black/30">
+                <div className="absolute top-0 right-0 p-10 opacity-10"><Lock size={120} /></div>
 
-                <div className="bg-black text-white p-6 rounded-2xl shadow-xl shadow-black/20">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 bg-zinc-800 rounded-xl"><DollarSign className="text-green-400" size={24} /></div>
-                        <span className="text-[10px] font-black uppercase text-zinc-500 bg-zinc-900 px-2 py-1 rounded">Ingresos</span>
-                    </div>
-                    <p className="text-4xl font-black tracking-tighter">${ingresoEstimado.toLocaleString()}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                        <TrendingUp size={14} className="text-green-400" />
-                        <p className="text-xs text-zinc-400 font-bold">Cobranza al día</p>
-                    </div>
-                </div>
+                <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
 
-                <div className="bg-white p-6 rounded-2xl border border-red-100 shadow-sm relative overflow-hidden">
-                    <div className="absolute right-0 top-0 p-6 opacity-5"><AlertCircle size={100} className="text-red-500" /></div>
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 bg-red-50 rounded-xl"><AlertCircle className="text-red-500" size={24} /></div>
-                        <span className="text-[10px] font-black uppercase text-red-300 bg-red-50 px-2 py-1 rounded">Atención</span>
+                    {/* Columna 1: El dinero real */}
+                    <div>
+                        <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest mb-2">Dinero en Caja (Confirmado)</p>
+                        <p className="text-5xl font-black text-green-400 tracking-tighter">${dineroReunido.toLocaleString()}</p>
+                        <p className="text-xs text-zinc-500 mt-2 font-bold">De {alCorriente} alumnos pagados</p>
                     </div>
-                    <p className="text-4xl font-black tracking-tighter text-red-500">{deudores}</p>
-                    <p className="text-xs text-red-400 mt-1 font-bold">Pagos Pendientes</p>
+
+                    {/* Columna 2: La barra de progreso (El detector visual) */}
+                    <div className="space-y-2">
+                        <div className="flex justify-between text-xs font-bold uppercase">
+                            <span className="text-zinc-400">Progreso de Cobranza</span>
+                            <span className={porcentajeCobrado < 50 ? "text-red-500" : "text-green-500"}>{porcentajeCobrado}%</span>
+                        </div>
+                        <div className="h-4 w-full bg-zinc-800 rounded-full overflow-hidden border border-zinc-700">
+                            <div
+                                style={{ width: `${porcentajeCobrado}%` }}
+                                className={`h-full transition-all duration-1000 ${porcentajeCobrado < 50 ? 'bg-red-500' : 'bg-green-500'
+                                    }`}
+                            />
+                        </div>
+                        <p className="text-[10px] text-zinc-500 text-center mt-1">
+                            Meta Mensual: ${dineroTotalEsperado.toLocaleString()}
+                        </p>
+                    </div>
+
+                    {/* Columna 3: ALERTA DE FUGA (Lo que falta) */}
+                    <div className="bg-white/10 p-4 rounded-2xl border border-white/10 backdrop-blur-md">
+                        <div className="flex items-center gap-2 mb-1">
+                            <AlertTriangle className="text-yellow-400" size={16} />
+                            <p className="text-yellow-400 text-[9px] font-black uppercase tracking-widest">Faltante / Posible Fuga</p>
+                        </div>
+                        <p className="text-2xl font-black text-white">${dineroFaltante.toLocaleString()}</p>
+                        <p className="text-[10px] text-zinc-400 leading-tight mt-1">
+                            Este dinero corresponde a los <strong>{conDeuda} alumnos</strong> marcados como activos pero sin pago registrado.
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            {/* Gráfica y Tabla */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Sección Gráfica */}
-                <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm h-[400px]">
-                    <h3 className="text-lg font-black italic uppercase mb-6">Tendencia de Ingresos</h3>
-                    <ResponsiveContainer width="100%" height="85%">
-                        <AreaChart data={chartData}>
-                            <defs>
-                                <linearGradient id="colorIngresos" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.1} />
-                                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f4f4f5" />
-                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#a1a1aa' }} />
-                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#a1a1aa' }} />
-                            <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} />
-                            <Area type="monotone" dataKey="ingresos" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorIngresos)" />
-                        </AreaChart>
-                    </ResponsiveContainer>
+            {/* 3. Tabla de Cobranza (Ya la tenías, la mantenemos igual de útil) */}
+            <div className="bg-white border border-zinc-200 rounded-[32px] overflow-hidden shadow-lg shadow-zinc-200/50">
+                <div className="p-8 border-b border-zinc-100 flex justify-between items-center">
+                    <h3 className="text-xl font-black italic uppercase">Detalle de Alumnos</h3>
+                    <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Gestión Individual</span>
                 </div>
 
-                {/* Sección Lista Rápida (Reutilizando tu tabla existente) */}
-                <div className="lg:col-span-3 bg-white border border-zinc-100 rounded-3xl p-2 shadow-sm">
-                    <div className="p-6 border-b border-zinc-50">
-                        <h3 className="text-lg font-black italic uppercase">Auditoría de Pagos</h3>
-                    </div>
-                    <AdminAuditTable data={data} onVerifyPayment={onVerifyPayment} onOpenProof={() => { }} />
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead className="bg-zinc-50/50 text-[9px] font-black uppercase text-zinc-400 tracking-widest">
+                            <tr>
+                                <th className="p-6 pl-8">Alumno</th>
+                                <th className="p-6">Docente</th>
+                                <th className="p-6 text-center">Estatus</th>
+                                <th className="p-6 text-right pr-8">Control</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-100">
+                            {data.alumnos.length === 0 ? (
+                                <tr><td colSpan={4} className="p-10 text-center text-zinc-400 font-bold">No hay alumnos registrados.</td></tr>
+                            ) : (
+                                data.alumnos.map((alumno) => {
+                                    const tieneDeuda = alumno.financial_status === 'DEBT';
+                                    const docente = data.docentes.find(d => d.id === alumno.docente_id);
+
+                                    return (
+                                        <tr key={alumno.id} className="hover:bg-zinc-50 transition-colors group">
+                                            <td className="p-6 pl-8">
+                                                <p className="font-bold text-sm text-zinc-900">{alumno.nombre_completo}</p>
+                                                <p className="font-mono text-xs text-zinc-400 mt-1">{alumno.matricula || 'S/M'}</p>
+                                            </td>
+                                            <td className="p-6">
+                                                {docente ? (
+                                                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-zinc-100 text-xs font-bold text-zinc-600">
+                                                        <User size={12} /> {docente.nombre_completo}
+                                                    </span>
+                                                ) : <span className="text-zinc-300 text-xs font-bold">Sin asignar</span>}
+                                            </td>
+                                            <td className="p-6 text-center">
+                                                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest ${tieneDeuda ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'
+                                                    }`}>
+                                                    {tieneDeuda ? <XCircle size={14} /> : <CheckCircle size={14} />}
+                                                    {tieneDeuda ? 'Sin Pago' : 'Pagado'}
+                                                </div>
+                                            </td>
+                                            <td className="p-6 text-right pr-8">
+                                                {tieneDeuda ? (
+                                                    <button
+                                                        onClick={() => {
+                                                            if (window.confirm(`¿Confirmar que recibiste $${COSTO_COLEGIATURA} de ${alumno.nombre_completo}?`)) {
+                                                                onVerifyPayment('manual', false, alumno.id);
+                                                            }
+                                                        }}
+                                                        className="bg-black text-white px-5 py-2 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-green-600 hover:shadow-lg transition-all flex items-center gap-2 ml-auto"
+                                                    >
+                                                        <CreditCard size={14} /> Cobrar
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => {
+                                                            // Opción para revertir pago si fue error (seguridad)
+                                                            if (window.confirm(`¿Marcar a ${alumno.nombre_completo} nuevamente con deuda?`)) {
+                                                                onVerifyPayment('manual', true, alumno.id);
+                                                            }
+                                                        }}
+                                                        className="text-zinc-300 hover:text-red-500 font-bold text-xs uppercase tracking-widest transition-colors"
+                                                    >
+                                                        Revertir
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

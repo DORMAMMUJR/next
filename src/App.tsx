@@ -12,6 +12,9 @@ const App: React.FC = () => {
   const [activeRole, setActiveRole] = useState<Role | null>(null);
   const [activeTab, setActiveTab] = useState<AdminSection>('dashboard');
 
+  // NUEVO: Estado para la Sede Activa
+  const [activeSede, setActiveSede] = useState<string>('GENERAL');
+
   // ESTADO DE DATOS (BD)
   const [data, setData] = useState<CityData>({
     alumnos: [], matriculas: [], pagos: [], expedientes: [], docentes: []
@@ -81,6 +84,29 @@ const App: React.FC = () => {
     }
   };
 
+  // --- FILTRADO DE DATOS POR SEDE ---
+  const getFilteredData = (): CityData => {
+    if (activeSede === 'GENERAL') return data;
+
+    // 1. Encontramos docentes de esa sede
+    const docentesSede = data.docentes.filter(d => d.sede_slug === activeSede);
+    const docenteIds = docentesSede.map(d => d.id);
+
+    // 2. Filtramos alumnos asignados a esos docentes
+    // NOTA: Si un alumno no tiene docente, no saldrá en la vista filtrada (o lo puedes manejar aparte)
+    const alumnosSede = data.alumnos.filter(a => a.docente_id && docenteIds.includes(a.docente_id));
+
+    return {
+      ...data,
+      alumnos: alumnosSede,
+      // Opcional: filtrar docentes también si quieres que baje solo la lista de esa sede
+      // docentes: docentesSede 
+    };
+  };
+
+  const filteredData = getFilteredData();
+
+
   // --- VISTA DOCENTE ---
   const TeacherDashboard = () => (
     <div className="space-y-6 animate-in fade-in">
@@ -117,16 +143,19 @@ const App: React.FC = () => {
     <>
       <Layout
         activeRole={activeRole}
-        onRoleSelect={() => { }}
+        onRoleSelect={() => { }} // Ya no se usa tanto en el nuevo layout pero lo dejamos por compatibilidad
         onHome={() => { }}
         onLogout={() => setShowLogin(true)}
-        onSedes={() => { }}
+        activeSede={activeSede}
+        onSedeSelect={setActiveSede}
+        // Props opcionales que estaban antes
         activeTab={activeTab}
         onTabChange={setActiveTab}
       >
         {activeRole === Role.OWNER ? (
           <OwnerDashboard
-            data={data}
+            data={filteredData} // <--- PASAMOS DATA FILTRADA
+            sedeName={activeSede} // <--- PASAMOS NOMBRE DE SEDE
             onVerifyPayment={(pagoId, status, alumnoId) => {
               fetch('/api/pagos/verify', {
                 method: 'POST',
