@@ -12,6 +12,7 @@ interface LayoutProps {
   // NUEVAS PROPS:
   currentView: AppView;
   onNavigate: (view: AppView) => void;
+  availableSedes?: string[]; // <-- NUEVO
   // Deprecated/Optional compatibility props (if needed by other parents, though App.tsx is updated)
   onRoleSelect?: (role: Role) => void;
   onHome?: () => void;
@@ -23,7 +24,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({
   children, activeSede, onSedeSelect, onLogout,
-  currentView, onNavigate, searchData // Desestructuramos searchData
+  currentView, onNavigate, searchData, availableSedes // <-- Desestructuramos availableSedes
 }) => {
 
   // Función auxiliar para las clases de los botones del menú
@@ -32,7 +33,7 @@ const Layout: React.FC<LayoutProps> = ({
     const isActive = currentView === view;
     return `w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all ${isActive
       ? 'bg-black text-white shadow-lg shadow-black/20'
-      : 'text-zinc-500 hover:bg-zinc-50 hover:text-black'
+      : 'text-zinc-600 hover:bg-zinc-50 hover:text-black'
       }`;
   };
 
@@ -85,7 +86,7 @@ const Layout: React.FC<LayoutProps> = ({
 
       {/* CONTENIDO PRINCIPAL responsive */}
       <main className="flex-1 ml-0 md:ml-64 flex flex-col min-h-screen">
-        <Navbar activeSede={activeSede} onSedeSelect={onSedeSelect} searchData={searchData} />
+        <Navbar activeSede={activeSede} onSedeSelect={onSedeSelect} searchData={searchData} availableSedes={availableSedes} />
         <div className="p-4 md:p-10 flex-1 overflow-auto bg-zinc-50/50">
           {children}
         </div>
@@ -95,21 +96,21 @@ const Layout: React.FC<LayoutProps> = ({
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200 p-2 flex justify-around z-50 pb-safe">
         <button
           onClick={() => onNavigate('dashboard')}
-          className={`flex flex-col items-center p-3 rounded-xl transition-colors ${currentView === 'dashboard' ? 'text-black' : 'text-zinc-500'}`}
+          className={`flex flex-col items-center p-3 rounded-xl transition-colors ${currentView === 'dashboard' ? 'text-black' : 'text-zinc-600'}`}
         >
           <LayoutDashboard size={24} />
           <span className="text-[10px] font-bold uppercase mt-1">Inicio</span>
         </button>
         <button
           onClick={() => onNavigate('teachers')}
-          className={`flex flex-col items-center p-3 rounded-xl transition-colors ${currentView === 'teachers' ? 'text-black' : 'text-zinc-500'}`}
+          className={`flex flex-col items-center p-3 rounded-xl transition-colors ${currentView === 'teachers' ? 'text-black' : 'text-zinc-600'}`}
         >
           <Users size={24} />
           <span className="text-[10px] font-bold uppercase mt-1">Docentes</span>
         </button>
         <button
           onClick={() => onNavigate('settings')}
-          className={`flex flex-col items-center p-3 rounded-xl transition-colors ${currentView === 'settings' ? 'text-black' : 'text-zinc-500'}`}
+          className={`flex flex-col items-center p-3 rounded-xl transition-colors ${currentView === 'settings' ? 'text-black' : 'text-zinc-600'}`}
         >
           <Settings size={24} />
           <span className="text-[10px] font-bold uppercase mt-1">Ajustes</span>

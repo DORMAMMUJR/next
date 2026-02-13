@@ -40,13 +40,25 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
         );
     };
 
+    // Estado para controlar qué pago se está confirmando
+    const [confirmingPaymentId, setConfirmingPaymentId] = useState<string | null>(null);
+
+    const handleConfirmPayment = (alumnoId: string) => {
+        onVerifyPayment('manual', false, alumnoId);
+        setConfirmingPaymentId(null);
+    };
+
+    const handleCancelPayment = () => {
+        setConfirmingPaymentId(null);
+    };
+
     return (
         <div className="space-y-8 animate-in fade-in pb-20 max-w-7xl mx-auto">
 
             {/* 1. Encabezado */}
             <div className="flex flex-col md:flex-row justify-between items-end gap-6">
                 <div>
-                    <span className="text-[10px] font-black uppercase text-zinc-500 tracking-widest bg-zinc-100 px-3 py-1 rounded-full">
+                    <span className="text-[10px] font-black uppercase text-zinc-600 tracking-widest bg-zinc-100 px-3 py-1 rounded-full">
                         Sede: {sedeName}
                     </span>
                     <h2 className="text-4xl mt-4 font-black italic uppercase tracking-tighter">
@@ -69,7 +81,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
 
                     {/* Columna 1: El dinero real */}
                     <div>
-                        <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-2">Dinero en Caja (Confirmado)</p>
+                        <p className="text-zinc-400 text-[10px] font-black uppercase tracking-widest mb-2">Dinero en Caja (Confirmado)</p>
                         <p className="text-5xl font-black text-green-400 tracking-tighter font-mono bg-zinc-800/50 inline-block px-2 rounded-lg">${dineroReunido.toLocaleString()}</p>
                         <p className="text-xs text-zinc-500 mt-2 font-bold">De <span className="font-mono text-zinc-300">{alCorriente}</span> alumnos pagados</p>
                     </div>
@@ -77,7 +89,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                     {/* Columna 2: La barra de progreso (El detector visual) */}
                     <div className="space-y-2">
                         <div className="flex justify-between text-xs font-bold uppercase">
-                            <span className="text-zinc-500">Progreso de Cobranza</span>
+                            <span className="text-zinc-400">Progreso de Cobranza</span>
                             <span className={`font-mono ${porcentajeCobrado < 50 ? "text-red-500" : "text-green-500"}`}>{porcentajeCobrado}%</span>
                         </div>
                         <div className="h-4 w-full bg-zinc-800 rounded-full overflow-hidden border border-zinc-700">
@@ -87,8 +99,8 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                                     }`}
                             />
                         </div>
-                        <p className="text-[10px] text-zinc-500 text-center mt-1">
-                            Meta Mensual: <span className="font-mono text-zinc-400">${dineroTotalEsperado.toLocaleString()}</span>
+                        <p className="text-[10px] text-zinc-400 text-center mt-1">
+                            Meta Mensual: <span className="font-mono text-zinc-300">${dineroTotalEsperado.toLocaleString()}</span>
                         </p>
                     </div>
 
@@ -99,7 +111,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                             <p className="text-yellow-400 text-[9px] font-black uppercase tracking-widest">Faltante / Posible Fuga</p>
                         </div>
                         <p className="text-2xl font-black text-white font-mono">${dineroFaltante.toLocaleString()}</p>
-                        <p className="text-[10px] text-zinc-400 leading-tight mt-1">
+                        <p className="text-[10px] text-zinc-300 leading-tight mt-1">
                             Este dinero corresponde a los <strong className="font-mono text-white">{conDeuda} alumnos</strong> marcados como activos pero sin pago registrado.
                         </p>
                     </div>
@@ -109,11 +121,11 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
             {/* --- SECCIÓN DE LISTAS POR DOCENTE --- */}
             <div className="space-y-6">
                 <h3 className="text-2xl font-black italic uppercase tracking-tighter">
-                    Nómina Académica <span className="text-zinc-500 text-sm not-italic font-bold">({sedeName})</span>
+                    Nómina Académica <span className="text-zinc-600 text-sm not-italic font-bold">({sedeName})</span>
                 </h3>
 
                 {docentesDeSede.length === 0 ? (
-                    <div className="p-10 text-center text-zinc-500 border border-dashed border-zinc-300 rounded-xl">
+                    <div className="p-10 text-center text-zinc-600 border border-dashed border-zinc-300 rounded-xl">
                         No hay docentes registrados en esta sede.
                     </div>
                 ) : (
@@ -137,7 +149,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                                         </div>
                                         <div className="text-left">
                                             <p className="font-black text-lg text-zinc-800 uppercase italic">{docente.nombre_completo}</p>
-                                            <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
+                                            <p className="text-xs font-bold text-zinc-600 uppercase tracking-widest">
                                                 <span className="font-mono text-black">{misAlumnos.length}</span> Alumnos asignados
                                             </p>
                                         </div>
@@ -151,7 +163,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                                             </span>
                                         )}
                                         <div className="w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center">
-                                            <User size={20} className="text-zinc-500" />
+                                            <User size={20} className="text-zinc-600" />
                                         </div>
                                     </div>
                                 </button>
@@ -161,7 +173,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                                     <div className="border-t border-zinc-100 bg-zinc-50/50 p-4 animate-in slide-in-from-top-2">
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-left">
-                                                <thead className="text-[9px] font-black uppercase text-zinc-500 tracking-widest">
+                                                <thead className="text-[9px] font-black uppercase text-zinc-900 tracking-widest">
                                                     <tr>
                                                         <th className="p-4 pl-6">Estudiante</th>
                                                         <th className="p-4">Matrícula</th>
@@ -173,7 +185,7 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                                                     {misAlumnos.map(alumno => (
                                                         <tr key={alumno.id} className="hover:bg-white transition-colors">
                                                             <td className="p-4 pl-6 font-bold text-zinc-700">{alumno.nombre_completo}</td>
-                                                            <td className="p-4 font-mono text-xs text-zinc-500">{alumno.matricula}</td>
+                                                            <td className="p-4 font-mono text-xs text-zinc-600">{alumno.matricula}</td>
                                                             <td className="p-4 text-center">
                                                                 {alumno.financial_status === 'DEBT' ? (
                                                                     <span className="inline-flex items-center gap-1 text-red-600 bg-red-50 px-2 py-1 rounded text-xs font-bold">
@@ -187,16 +199,30 @@ const OwnerDashboard: React.FC<DashboardProps> = ({ data, sedeName, onVerifyPaym
                                                             </td>
                                                             <td className="p-4 text-right">
                                                                 {alumno.financial_status === 'DEBT' ? (
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            if (window.confirm(`¿Confirmar que recibiste $${COSTO_COLEGIATURA} de ${alumno.nombre_completo}?`)) {
-                                                                                onVerifyPayment('manual', false, alumno.id);
-                                                                            }
-                                                                        }}
-                                                                        className="bg-black text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-green-600 transition-colors shadow-lg shadow-black/10"
-                                                                    >
-                                                                        Cobrar
-                                                                    </button>
+                                                                    confirmingPaymentId === alumno.id ? (
+                                                                        <div className="flex items-center justify-end gap-2 animate-in fade-in slide-in-from-right-4">
+                                                                            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-tight">¿Confirmar ${COSTO_COLEGIATURA}?</span>
+                                                                            <button
+                                                                                onClick={() => handleConfirmPayment(alumno.id)}
+                                                                                className="bg-green-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-green-600 transition-colors shadow-lg shadow-green-500/20"
+                                                                            >
+                                                                                SÍ
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={handleCancelPayment}
+                                                                                className="bg-zinc-200 text-zinc-500 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-zinc-300 transition-colors"
+                                                                            >
+                                                                                CANCELAR
+                                                                            </button>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={() => setConfirmingPaymentId(alumno.id)}
+                                                                            className="bg-black text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors shadow-lg shadow-black/10"
+                                                                        >
+                                                                            Cobrar
+                                                                        </button>
+                                                                    )
                                                                 ) : (
                                                                     <button
                                                                         onClick={() => {

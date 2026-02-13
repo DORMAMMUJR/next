@@ -1,46 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-    background-color: #ffffff;
-    font-family: 'Inter', sans-serif;
+@layer base {
+    html {
+        font-family: 'Inter', sans-serif;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-zinc-50 text-zinc-900;
+        /* Texto base más oscuro */
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-black tracking-tight text-black;
+    }
 }
 
-.font-mono {
-    font-family: 'JetBrains Mono', monospace;
+@layer components {
+
+    /* Utilería para subtítulos y etiquetas */
+    .text-subtle {
+        @apply text-zinc-500 font-semibold uppercase tracking-wider text-[0.65rem];
+    }
+
+    /* Utilería para texto secundario pero legible */
+    .text-secondary {
+        @apply text-zinc-600 font-medium text-sm;
+    }
+
+    .btn-primary {
+        @apply bg-black text-white font-bold uppercase tracking-widest px-6 py-3 rounded-xl hover:bg-zinc-800 transition-all active:scale-95 shadow-lg shadow-black/10;
+    }
+
+    .card-base {
+        @apply bg-white border border-zinc-200 rounded-[2rem] shadow-sm;
+    }
 }
 
-/* Reglas para mejorar la legibilidad */
-.text-readable-secondary {
-    @apply text-zinc-600 font-medium;
-    /* Gris oscuro y con peso medio */
-}
-
-.text-readable-title {
-    @apply text-zinc-900 font-black tracking-tight;
-    /* Negro sólido */
-}
-
-/* Hacemos los inputs más legibles */
-input,
-select,
-textarea {
-    @apply text-zinc-900 font-bold placeholder:text-zinc-400;
-}
-
-/* Scrollbar elegante */
+/* Scrollbar */
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent;
+    background: #f4f4f5;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #e4e4e7;
-    border-radius: 4px;
+    background: #d4d4d8;
+    border-radius: 5px;
+    border: 2px solid #f4f4f5;
 }
 
 ::-webkit-scrollbar-thumb:hover {

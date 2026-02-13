@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Role, CityData, AppView } from './types';
+import { CITIES } from './constants';
 import { MessageCircleQuestion } from 'lucide-react'; // Icono para el botón
 import LandingPage from './components/LandingPage';
 import Layout from './components/Layout';
@@ -23,16 +24,20 @@ const App: React.FC = () => {
   // NUEVO: Estado para la Sede Activa
   const [activeSede, setActiveSede] = useState<string>('GENERAL');
 
+  // NUEVO: Estado para gestionar las SEDES disponibles
+  const [availableSedes, setAvailableSedes] = useState<string[]>(CITIES.map(c => c.slug));
+
   // --- GENERADOR DE DATOS DE PRUEBA ---
   const generateDummyData = (): CityData => {
-    const sedes = ['aguascalientes', 'cdmx', 'monterrey', 'guadalajara', 'queretaro', 'cancun'];
+    // Usamos las sedes iniciales para generar datos (esto solo corre una vez)
+    const sedesIniciales = ['aguascalientes', 'cdmx', 'monterrey', 'guadalajara', 'queretaro', 'cancun'];
     const docentesNombres = ['Roberto Gómez', 'Laura Pausini', 'Carlos Santana', 'Frida Kahlo', 'Pedro Infante', 'Selena Quintanilla'];
 
     let docentes: any[] = [];
     let alumnos: any[] = [];
 
     // Creamos 2 o 3 maestros por sede
-    sedes.forEach((sede) => {
+    sedesIniciales.forEach((sede) => {
       // 3 Maestros por sede
       for (let i = 0; i < 3; i++) {
         const docId = `doc-${sede}-${i}`;
@@ -203,9 +208,14 @@ const App: React.FC = () => {
           />
         );
       case 'teachers':
-        return <TeachersView />;
+        return <TeachersView docentes={data.docentes} alumnos={data.alumnos} />;
       case 'settings':
-        return <SettingsView />;
+        return (
+          <SettingsView
+            availableSedes={availableSedes}
+            onAddSede={(newSede) => setAvailableSedes([...availableSedes, newSede])}
+          />
+        );
       default:
         return (
           <OwnerDashboard
@@ -261,6 +271,7 @@ const App: React.FC = () => {
         currentView={currentView} // <-- NUEVO
         onNavigate={setCurrentView} // <-- NUEVO: Le pasamos la función para cambiar la vista
         searchData={data}
+        availableSedes={availableSedes} // <-- NUEVO: Pasamos las sedes dinámicas al Layout
       >
         {/* 5. RENDERIZA EL CONTENIDO DINÁMICO */}
         {renderContent()}
