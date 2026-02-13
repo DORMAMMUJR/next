@@ -44,6 +44,22 @@ app.get('/api/dashboard', async (req, res) => {
   }
 });
 
+// API: Crear un nuevo Alumno (POST)
+app.post('/api/alumnos', async (req, res) => {
+  const { id, nombre_completo, matricula, fecha_nacimiento, docente_id, grupo, generacion } = req.body;
+  try {
+    await pool.query(
+      `INSERT INTO alumnos (id, nombre_completo, matricula, fecha_nacimiento, docente_id, grupo, generacion, financial_status, estatus) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'CLEAN', 'Activo')`,
+      [id, nombre_completo, matricula, fecha_nacimiento, docente_id, grupo, generacion]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al registrar alumno. Verifique que la matrícula no esté duplicada.' });
+  }
+});
+
 // 3. API: VALIDAR PAGO (POST)
 app.post('/api/pagos/verify', async (req, res) => {
   const { pagoId, verified, alumnoId, newStatus } = req.body;

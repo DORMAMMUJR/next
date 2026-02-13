@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CityData } from '../types';
 
@@ -86,11 +85,11 @@ const AdminAuditTable: React.FC<AdminAuditTableProps> = ({ data, onVerifyPayment
                     <td className="p-6 text-center">
                        {debtCount > 0 ? (
                          <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wide">
-                           {debtCount} con Adeudo
+                           {debtCount} En Deuda
                          </span>
                        ) : (
                          <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wide">
-                           0% Morosidad
+                           Al Corriente
                          </span>
                        )}
                     </td>
@@ -136,11 +135,13 @@ const AdminAuditTable: React.FC<AdminAuditTableProps> = ({ data, onVerifyPayment
                                                  {student.matricula}
                                               </td>
                                               <td className="p-4">
-                                                 {student.financial_status === 'CLEAN' ? (
-                                                    <span className="text-green-600 text-[9px] font-black uppercase bg-green-50 px-2 py-1 rounded">● Al Corriente</span>
-                                                 ) : (
-                                                    <span className="text-red-600 text-[9px] font-black uppercase bg-red-50 px-2 py-1 rounded">● Adeudo</span>
-                                                 )}
+                                                 <span className={`px-2 py-1 rounded text-[8px] font-black uppercase ${
+                                                   student.financial_status === 'DEBT' 
+                                                     ? 'bg-red-100 text-red-700' 
+                                                     : 'bg-green-100 text-green-700'
+                                                 }`}>
+                                                   {student.financial_status === 'DEBT' ? 'EN DEUDA' : 'AL CORRIENTE'}
+                                                 </span>
                                               </td>
                                               <td className="p-4">
                                                  {lastPayment && lastPayment.proof_url ? (

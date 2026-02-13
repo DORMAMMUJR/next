@@ -25,6 +25,17 @@ const App: React.FC = () => {
   const [proofModalOpen, setProofModalOpen] = useState(false);
   const [currentProofUrl, setCurrentProofUrl] = useState<string | null>(null);
 
+  // --- ADD STUDENT STATE ---
+  const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+  const [newStudent, setNewStudent] = useState({
+    nombre_completo: '',
+    matricula: '',
+    fecha_nacimiento: '',
+    docente_id: '',
+    grupo: '',
+    generacion: ''
+  });
+
   // --- LOGGING ACTION (CONECTADO A DB) ---
   const logAction = async (user_id: string, role: Role, action: 'LOGIN_SUCCESS' | 'PANIC_BUTTON' | 'UNAUTHORIZED_ACCESS', details?: string) => {
     const newEntry: AuditLogEntry = {
@@ -141,6 +152,46 @@ const App: React.FC = () => {
     return { success: false, error: "Rol no reconocido." };
   };
 
+  // --- HANDLE ADD STUDENT ---
+  const handleAddStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const id = `ALUM-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+    
+    try {
+      const response = await fetch('/api/alumnos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...newStudent,
+          id
+        })
+      });
+
+      if (response.ok) {
+        // Recargar datos
+        const res = await fetch('/api/dashboard');
+        const dbData = await res.json();
+        setData(dbData);
+        setToastMsg("Alumno registrado exitosamente");
+        setIsAddStudentOpen(false);
+        // Reset form
+        setNewStudent({
+            nombre_completo: '',
+            matricula: '',
+            fecha_nacimiento: '',
+            docente_id: '',
+            grupo: '',
+            generacion: ''
+        });
+      } else {
+        setToastMsg("Error al registrar: Verifique matrícula");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      setToastMsg("Error de conexión");
+    }
+  };
+
   // --- VALIDACIÓN DE PAGOS (CONECTADO A DB) ---
   const togglePaymentVerification = (pagoId: string, currentStatus: boolean, alumnoId: string) => {
     // 1. Calcular nuevo estado optimista
@@ -191,7 +242,62 @@ const App: React.FC = () => {
     setProofModalOpen(true);
   };
 
-  // --- VISTAS ---
+  // --- MODALES Y VISTAS ---
+
+  const AddStudentModal = () => (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsAddStudentOpen(false)}></div>
+      <div className="bg-white w-full max-w-lg p-8 rounded-[32px] shadow-2xl relative z-10 animate-in zoom-in-95">
+        <button onClick={() => setIsAddStudentOpen(false)} className="absolute top-6 right-6 text-zinc-400 hover:text-black font-bold">✕</button>
+        <h3 className="text-2xl font-black italic uppercase mb-6">Nuevo Alumno<span className="text-next-green">.</span></h3>
+        <form onSubmit={handleAddStudent} className="space-y-4">
+            <div>
+                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Nombre Completo</label>
+                <input required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 uppercase" 
+                    value={newStudent.nombre_completo} onChange={e => setNewStudent({...newStudent, nombre_completo: e.target.value.toUpperCase()})} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Matrícula</label>
+                    <input required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 uppercase" 
+                        value={newStudent.matricula} onChange={e => setNewStudent({...newStudent, matricula: e.target.value.toUpperCase()})} />
+                </div>
+                <div>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Password (DDMMAAAA)</label>
+                    <input required placeholder="01012000" className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1" 
+                        value={newStudent.fecha_nacimiento} onChange={e => setNewStudent({...newStudent, fecha_nacimiento: e.target.value})} />
+                </div>
+            </div>
+            <div>
+                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Docente Responsable</label>
+                <select required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1"
+                    value={newStudent.docente_id} onChange={e => setNewStudent({...newStudent, docente_id: e.target.value})}>
+                    <option value="">Seleccionar...</option>
+                    {data.docentes.map(d => (
+                        <option key={d.id} value={d.id}>{d.nombre_completo}</option>
+                    ))}
+                </select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Grupo</label>
+                    <input required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 uppercase" 
+                        value={newStudent.grupo} onChange={e => setNewStudent({...newStudent, grupo: e.target.value.toUpperCase()})} />
+                </div>
+                <div>
+                    <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Generación</label>
+                    <input required className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-bold mt-1 uppercase" 
+                        value={newStudent.generacion} onChange={e => setNewStudent({...newStudent, generacion: e.target.value.toUpperCase()})} />
+                </div>
+            </div>
+            <button type="submit" className="w-full bg-black text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-next-green transition-colors mt-4">
+                Registrar Alumno
+            </button>
+        </form>
+      </div>
+    </div>
+  );
+
   const OwnerDashboard = () => {
     if (!currentSlug) return <CampusSelector onSelect={(slug) => { setCurrentSlug(slug); setActiveTab('dashboard'); }} />;
     const totalStudents = data.alumnos.length;
@@ -205,7 +311,10 @@ const App: React.FC = () => {
              <h2 className="text-4xl font-black italic uppercase tracking-tighter text-black">Sede {currentSlug}</h2>
              <p className="text-xs font-bold text-zinc-500 mt-1">Panel de Auditoría y Control Financiero</p>
           </div>
-          <div className="flex gap-8 text-right">
+          <div className="flex gap-4 items-center text-right">
+             <button onClick={() => setIsAddStudentOpen(true)} className="bg-black text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-zinc-800 transition-all shadow-lg h-fit">
+                + Alumno
+             </button>
              <div className="bg-zinc-50 px-6 py-3 rounded-2xl border border-zinc-100">
                 <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Alumnos Activos</p>
                 <p className="text-2xl font-black">{totalStudents}</p>
@@ -285,7 +394,7 @@ const App: React.FC = () => {
                   <tr key={a.id} className={`transition-all ${isBlocked ? 'bg-zinc-50/50' : 'hover:bg-zinc-50'}`}>
                     <td className="p-6"><p className="font-bold text-sm uppercase text-black">{a.nombre_completo}</p></td>
                     <td className="p-6 text-xs font-mono text-zinc-700">{a.matricula}</td>
-                    <td className="p-6"><span className={`px-2 py-1 rounded text-[8px] font-black uppercase ${isBlocked ? 'bg-zinc-200 text-zinc-600' : 'bg-green-100 text-green-800'}`}>{isBlocked ? 'Restringido' : 'Habilitado'}</span></td>
+                    <td className="p-6"><span className={`px-2 py-1 rounded text-[8px] font-black uppercase ${isBlocked ? 'bg-zinc-200 text-zinc-600' : 'bg-green-100 text-green-800'}`}>{isBlocked ? 'PENDIENTE DE PAGO' : 'HABILITADO'}</span></td>
                     <td className="p-6 text-right relative z-10"><SafeGradeInput currentGrade={a.calificacion_parcial} studentName={a.nombre_completo} isLocked={isBlocked} onSave={(newGrade) => handleGradeSave(a.id, newGrade)} /></td>
                   </tr>
                 )
@@ -336,6 +445,7 @@ const App: React.FC = () => {
       )}
       {/* Toast y Modales */}
       {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}
+      {isAddStudentOpen && <AddStudentModal />}
     </>
   );
 };
