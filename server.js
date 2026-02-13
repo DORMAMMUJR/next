@@ -71,7 +71,36 @@ app.post('/api/alumnos/grade', async (req, res) => {
   }
 });
 
-// 5. SPA FALLBACK (Siempre al final)
+// --- RUTAS DE AUDITORÍA ---
+
+// 5. Obtener logs
+app.get('/api/logs', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM audit_logs ORDER BY timestamp DESC LIMIT 100');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    // Si falla (ej. tabla no existe), devolvemos array vacío para no romper el front
+    res.json([]);
+  }
+});
+
+// 6. Guardar log
+app.post('/api/logs', async (req, res) => {
+  const { id, user_id, role, action, details } = req.body;
+  try {
+    await pool.query(
+      'INSERT INTO audit_logs (id, user_id, role, action, details, timestamp) VALUES ($1, $2, $3, $4, $5, NOW())',
+      [id, user_id, role, action, details]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al guardar log' });
+  }
+});
+
+// 7. SPA FALLBACK (Siempre al final)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });

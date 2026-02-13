@@ -25,6 +25,32 @@ const App: React.FC = () => {
   const [proofModalOpen, setProofModalOpen] = useState(false);
   const [currentProofUrl, setCurrentProofUrl] = useState<string | null>(null);
 
+  // --- LOGGING ACTION (CONECTADO A DB) ---
+  const logAction = async (user_id: string, role: Role, action: 'LOGIN_SUCCESS' | 'PANIC_BUTTON' | 'UNAUTHORIZED_ACCESS', details?: string) => {
+    const newEntry: AuditLogEntry = {
+      id: Math.random().toString(36).substr(2, 9),
+      timestamp: new Date().toISOString(),
+      user_id,
+      role,
+      action,
+      details: details || ''
+    };
+
+    // 1. Guardar en Base de Datos vía API
+    try {
+      await fetch('/api/logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newEntry)
+      });
+    } catch (err) {
+      console.error("No se pudo persistir el log:", err);
+    }
+
+    // 2. Actualizar estado local para que se vea inmediato en la tabla
+    setAuditLogs(prev => [newEntry, ...prev]);
+  };
+
   // --- CARGAR DATOS DESDE LA BASE DE DATOS (SERVER) ---
   useEffect(() => {
     if (currentSlug) {
@@ -47,6 +73,19 @@ const App: React.FC = () => {
     }
   }, [currentSlug]);
 
+  // --- CARGAR LOGS DE AUDITORÍA ---
+  useEffect(() => {
+    // Cargar logs desde la DB real al entrar como Admin/Dueña
+    if (activeRole === Role.OWNER) {
+      fetch('/api/logs')
+        .then(res => res.json())
+        .then(dbLogs => {
+           if(Array.isArray(dbLogs)) setAuditLogs(dbLogs);
+        })
+        .catch(err => console.error("Error cargando bitácora:", err));
+    }
+  }, [activeRole]);
+
   const showToast = (message: string) => {
     setToastMsg(message);
   };
@@ -57,6 +96,7 @@ const App: React.FC = () => {
       if (identifier === '123' && credential === '123') { // Backdoor para pruebas
          const demoStudent = data.alumnos[0];
          if (demoStudent) {
+            logAction('DEMO-ALUMNO', Role.ALUMNO, 'LOGIN_SUCCESS', 'Acceso Rápido Demo');
             setCurrentSlug('aguascalientes');
             setSelectedAlumnoId(demoStudent.id);
             setActiveRole(Role.ALUMNO);
@@ -67,6 +107,8 @@ const App: React.FC = () => {
       const alumno = data.alumnos.find(a => a.matricula === identifier && a.fecha_nacimiento === credential);
       if (!alumno) return { success: false, error: "Credenciales incorrectas." };
       
+      logAction(identifier, Role.ALUMNO, 'LOGIN_SUCCESS', alumno.financial_status === 'DEBT' ? 'Login con bloqueo' : 'Acceso limpio');
+
       if (alumno.financial_status === 'DEBT') return { success: false, status: 'DEBT' };
       
       setSelectedAlumnoId(alumno.id);
@@ -77,6 +119,7 @@ const App: React.FC = () => {
     else if (role === Role.PROFESOR) {
       // Login simple para docentes
       if (identifier === 'DOC-001') {
+        logAction(identifier, Role.PROFESOR, 'LOGIN_SUCCESS');
         setActiveRole(Role.PROFESOR);
         setCurrentSlug('aguascalientes');
         setShowLogin(false);
@@ -87,6 +130,7 @@ const App: React.FC = () => {
     else if (role === Role.OWNER) {
       // Login de Dueña
       if ((identifier === '1234' && credential === '123')) {
+        logAction(identifier, Role.OWNER, 'LOGIN_SUCCESS');
         setActiveRole(Role.OWNER);
         setCurrentSlug(null); 
         setShowLogin(false);
@@ -177,6 +221,54 @@ const App: React.FC = () => {
     );
   };
 
+  const AuditLogView = () => {
+    return (
+      <div className="space-y-8 animate-in fade-in">
+        <h2 className="text-4xl font-black italic uppercase tracking-tighter text-black">Bitácora de Accesos <span className="text-next-green">.</span></h2>
+        <div className="bg-white border border-zinc-200 rounded-[32px] overflow-hidden shadow-sm">
+          <div className="max-h-[600px] overflow-y-auto">
+            <table className="w-full text-left">
+              <thead className="bg-zinc-100 text-[9px] font-black uppercase tracking-widest text-zinc-600 sticky top-0 z-10">
+                <tr>
+                  <th className="p-6">Fecha y Hora</th>
+                  <th className="p-6">Usuario (ID)</th>
+                  <th className="p-6">Rol</th>
+                  <th className="p-6">Acción</th>
+                  <th className="p-6">Detalles</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100">
+                {auditLogs.map((log) => (
+                  <tr key={log.id} className="hover:bg-zinc-50 transition-colors">
+                    <td className="p-6 text-xs font-mono text-zinc-700">
+                      {new Date(log.timestamp).toLocaleDateString('es-MX')} <span className="text-black font-bold">{new Date(log.timestamp).toLocaleTimeString('es-MX')}</span>
+                    </td>
+                    <td className="p-6 font-bold text-sm font-mono text-black">{log.user_id}</td>
+                    <td className="p-6">
+                      <span className={`px-2 py-1 rounded text-[8px] font-black uppercase tracking-wider
+                        ${log.role === Role.OWNER ? 'bg-black text-white' : 
+                          log.role === Role.PROFESOR ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
+                        {log.role}
+                      </span>
+                    </td>
+                    <td className="p-6 text-[10px] font-black uppercase tracking-wide">
+                      {log.action === 'LOGIN_SUCCESS' && <span className="text-green-700">✅ Inicio de Sesión</span>}
+                      {log.action === 'PANIC_BUTTON' && <span className="text-red-700">🚨 Botón de Pánico</span>}
+                      {log.action === 'UNAUTHORIZED_ACCESS' && <span className="text-orange-700">🚫 Acceso Denegado</span>}
+                    </td>
+                    <td className="p-6 text-xs text-zinc-600 italic">
+                      {log.details || '-'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const TeacherView = () => {
     return (
       <div className="space-y-8 animate-in fade-in">
@@ -211,13 +303,36 @@ const App: React.FC = () => {
     <>
       {activeRole === Role.OWNER && (
         <Layout activeRole={Role.OWNER} onRoleSelect={() => {}} onHome={() => { setCurrentSlug(null); setActiveTab('dashboard'); }} onLogout={() => setShowLogin(true)} onSedes={() => setCurrentSlug(null)} currentAdminSection={activeTab} onAdminSectionChange={(section) => setActiveTab(section)}>
-          {activeTab === 'dashboard' ? <OwnerDashboard /> : <div className="p-10 text-center font-black uppercase text-zinc-300">Módulo en construcción</div>}
+          {activeTab === 'dashboard' ? <OwnerDashboard /> : 
+           activeTab === 'auditoria' ? <AuditLogView /> :
+           <div className="p-10 text-center font-black uppercase text-zinc-300">Módulo en construcción</div>}
         </Layout>
       )}
       {activeRole === Role.PROFESOR && (
         <Layout activeRole={Role.PROFESOR} onRoleSelect={() => {}} onHome={() => setActiveTab('materias')} onLogout={() => setShowLogin(true)} onSedes={() => {}}>
           <TeacherView />
         </Layout>
+      )}
+      {activeRole === Role.ALUMNO && (
+        <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+           <div className="max-w-2xl w-full text-center space-y-8 animate-in zoom-in-95">
+              <h1 className="text-5xl font-black italic uppercase text-black">Bienvenido, {data.alumnos.find(a => a.id === selectedAlumnoId)?.nombre_completo.split(' ')[0]}<span className="text-next-green">.</span></h1>
+              {data.alumnos.find(a => a.id === selectedAlumnoId)?.financial_status === 'CLEAN' ? (
+                <div className="bg-green-50 border-2 border-green-500 p-8 rounded-[40px]">
+                   <span className="text-5xl mb-4 block">✅</span>
+                   <h3 className="text-2xl font-black uppercase text-green-800 mb-2">Estás al corriente</h3>
+                   <p className="text-xs font-bold text-green-900 uppercase">Tienes acceso total a tus clases y envío de tareas.</p>
+                </div>
+              ) : (
+                <div className="bg-red-50 border-2 border-red-500 p-8 rounded-[40px]">
+                   <span className="text-5xl mb-4 block">🚫</span>
+                   <h3 className="text-2xl font-black uppercase text-red-800 mb-2">Pago en revisión o pendiente</h3>
+                   <p className="text-xs font-bold text-red-900 uppercase">Tu pago no ha sido conciliado por auditoría o presentas adeudo.</p>
+                </div>
+              )}
+              <button onClick={() => setShowLogin(true)} className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-black">Cerrar Sesión</button>
+           </div>
+        </div>
       )}
       {/* Toast y Modales */}
       {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}

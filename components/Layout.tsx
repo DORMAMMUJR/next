@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Role, AdminSection } from '../types';
 import Navbar from './Navbar';
@@ -118,8 +117,8 @@ const Layout: React.FC<LayoutProps> = ({
           </>
         )}
 
-        <main className={`flex-1 flex flex-col min-h-[calc(100vh-64px)] md:min-h-[calc(100vh-96px)] bg-white transition-all`}>
-          <div className={`flex-1 ${activeRole || currentAdminSection === 'sedes' ? 'p-4 sm:p-8 md:p-16 max-w-[1600px] mx-auto w-full' : ''}`}>
+        <main className="flex-1 flex flex-col min-h-screen bg-white transition-all">
+          <div className={`flex-grow ${activeRole || currentAdminSection === 'sedes' ? 'p-4 sm:p-8 md:p-16 max-w-[1600px] mx-auto w-full' : ''}`}>
             {children}
           </div>
           <Footer />
