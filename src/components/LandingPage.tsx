@@ -5,9 +5,10 @@ import Footer from './Footer';
 
 interface LandingProps {
   onLogin: (identifier: string, credential: string, role: Role) => Promise<{ success: boolean; error?: string }>;
+  onGoToUpload: () => void;
 }
 
-const LandingPage: React.FC<LandingProps> = ({ onLogin }) => {
+const LandingPage: React.FC<LandingProps> = ({ onLogin, onGoToUpload }) => {
   const [viewState, setViewState] = useState<'menu' | 'login'>('menu');
   const [selectedRole, setSelectedRole] = useState<Role>(Role.PROFESOR);
   const [identifier, setIdentifier] = useState('');
@@ -194,6 +195,18 @@ const LandingPage: React.FC<LandingProps> = ({ onLogin }) => {
                       </>
                     )}
                   </button>
+
+                  <div className="mt-8 pt-8 border-t border-zinc-100 text-center">
+                    <p className="text-zinc-400 text-xs font-bold uppercase mb-3">Zona de Alumnos</p>
+                    <button
+                      type="button"
+                      onClick={onGoToUpload}
+                      className="w-full bg-white border-2 border-zinc-100 text-zinc-600 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:border-black hover:text-black transition-all flex items-center justify-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" x2="12" y1="3" y2="15" /></svg>
+                      Subir Comprobante de Pago
+                    </button>
+                  </div>
                 </motion.form>
               )}
             </AnimatePresence>

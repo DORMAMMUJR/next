@@ -8,6 +8,7 @@ import SafeGradeInput from './components/SafeGradeInput';
 import Toast from './components/Toast';
 import TeachersView from './components/TeachersView';
 import SettingsView from './components/SettingsView';
+import StudentUpload from './components/StudentUpload';
 
 const App: React.FC = () => {
   const [showLogin, setShowLogin] = useState(true);
@@ -183,7 +184,31 @@ const App: React.FC = () => {
     }
   };
 
-  if (showLogin) return <LandingPage onLogin={handleLogin} />;
+  // 4. NUEVO ESTADO PARA LA SUBIDA DE ALUMNOS (SIN LOGIN)
+  const [showUpload, setShowUpload] = useState(false);
+
+  if (showUpload) {
+    return (
+      <StudentUpload
+        onBack={() => setShowUpload(false)}
+        onUpload={(matricula, file) => {
+          console.log(`Subiendo archivo ${file.name} de ${matricula}`);
+          // Aquí conectarías con tu backend real
+          alert("Pago enviado al administrador (Simulación).");
+          setShowUpload(false);
+        }}
+      />
+    );
+  }
+
+  if (showLogin) {
+    return (
+      <LandingPage
+        onLogin={handleLogin}
+        onGoToUpload={() => setShowUpload(true)}
+      />
+    );
+  }
 
   return (
     <>
