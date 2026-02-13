@@ -43,12 +43,12 @@ const App: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newEntry)
       });
+      
+      // 2. Actualizar estado local para que se vea inmediato en la tabla
+      setAuditLogs(prev => [newEntry, ...prev]);
     } catch (err) {
       console.error("No se pudo persistir el log:", err);
     }
-
-    // 2. Actualizar estado local para que se vea inmediato en la tabla
-    setAuditLogs(prev => [newEntry, ...prev]);
   };
 
   // --- CARGAR DATOS DESDE LA BASE DE DATOS (SERVER) ---

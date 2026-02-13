@@ -118,9 +118,11 @@ const Layout: React.FC<LayoutProps> = ({
         )}
 
         <main className="flex-1 flex flex-col min-h-screen bg-white transition-all">
+          {/* El contenedor del contenido debe expandirse para empujar el footer */}
           <div className={`flex-grow ${activeRole || currentAdminSection === 'sedes' ? 'p-4 sm:p-8 md:p-16 max-w-[1600px] mx-auto w-full' : ''}`}>
             {children}
           </div>
+          {/* El Footer ahora siempre estará al final del scroll */}
           <Footer />
         </main>
       </div>

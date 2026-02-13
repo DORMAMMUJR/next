@@ -73,19 +73,18 @@ app.post('/api/alumnos/grade', async (req, res) => {
 
 // --- RUTAS DE AUDITORÍA ---
 
-// 5. Obtener logs
+// 5. Obtener todos los logs de la base de datos
 app.get('/api/logs', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM audit_logs ORDER BY timestamp DESC LIMIT 100');
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    // Si falla (ej. tabla no existe), devolvemos array vacío para no romper el front
-    res.json([]);
+    res.status(500).json({ error: 'Error al cargar la bitácora' });
   }
 });
 
-// 6. Guardar log
+// 6. Guardar un nuevo log (Inicio de sesión, pánico, etc.)
 app.post('/api/logs', async (req, res) => {
   const { id, user_id, role, action, details } = req.body;
   try {
