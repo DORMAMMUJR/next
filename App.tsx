@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { CITIES, CITY_KEYS } from './constants';
 import { Alumno, Matricula, Pago, CityData, City, ExpedienteAlumno, DocumentoPDF, Role, AuditLogEntry, AdminSection, Docente } from './types';
@@ -136,24 +135,59 @@ const App: React.FC = () => {
   const [proofModalOpen, setProofModalOpen] = useState(false);
   const [currentProofUrl, setCurrentProofUrl] = useState<string | null>(null);
 
-  // Cargar datos de ciudad
+  // Cargar datos de ciudad y API
   useEffect(() => {
-    if (currentSlug) {
-      const storageKey = `NEXT_DATA_${currentSlug}`;
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        // Si es Aguascalientes y no tiene docentes, re-seed (para desarrollo)
-        if (currentSlug === 'aguascalientes' && (!parsed.docentes || parsed.docentes.length === 0)) {
-          saveData(SEED_AGUASCALIENTES);
-        } else {
-          setData(parsed);
+    const loadData = async () => {
+      if (currentSlug) {
+        // 1. Intentar cargar desde localStorage primero (optimista)
+        const storageKey = `NEXT_DATA_${currentSlug}`;
+        const saved = localStorage.getItem(storageKey);
+        
+        // 2. Intentar cargar desde API PostgreSQL
+        try {
+          // Nota: Si estás probando localmente y no tienes el backend de PG corriendo,
+          // esto fallará silenciosamente y usará los datos semilla.
+          const response = await fetch('/api/alumnos');
+          if (response.ok) {
+            const dbAlumnos = await response.json();
+            
+            // Si la base de datos retorna registros, los usamos
+            if (Array.isArray(dbAlumnos) && dbAlumnos.length > 0) {
+              console.log("✅ Datos cargados desde PostgreSQL:", dbAlumnos.length, "registros.");
+              
+              // Aquí fusionamos con la estructura existente. 
+              // Asumimos que la tabla 'alumnos' tiene columnas compatibles con la interfaz Alumno
+              setData(prev => ({
+                ...prev,
+                alumnos: dbAlumnos as Alumno[],
+                // Si la DB solo trae alumnos, mantenemos docentes y otros datos del seed/local
+                // para que la app no se vea vacía en otras secciones.
+                docentes: prev.docentes.length ? prev.docentes : SEED_AGUASCALIENTES.docentes,
+                pagos: prev.pagos.length ? prev.pagos : SEED_AGUASCALIENTES.pagos
+              }));
+              return; // Salimos si la carga de DB fue exitosa
+            }
+          }
+        } catch (error) {
+          console.log("ℹ️ No se pudo conectar a la API (usando modo offline/demo):", error);
         }
-      } else {
-        const initial = currentSlug === 'aguascalientes' ? SEED_AGUASCALIENTES : { alumnos: [], matriculas: [], pagos: [], expedientes: [], docentes: [] };
-        saveData(initial);
+
+        // 3. Fallback: Si no hubo API o falló, usamos LocalStorage o Seed
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (currentSlug === 'aguascalientes' && (!parsed.docentes || parsed.docentes.length === 0)) {
+            saveData(SEED_AGUASCALIENTES);
+          } else {
+            setData(parsed);
+          }
+        } else {
+          const initial = currentSlug === 'aguascalientes' ? SEED_AGUASCALIENTES : { alumnos: [], matriculas: [], pagos: [], expedientes: [], docentes: [] };
+          saveData(initial);
+        }
       }
-    }
+    };
+
+    loadData();
   }, [currentSlug]);
 
   // Cargar registros de auditoría
