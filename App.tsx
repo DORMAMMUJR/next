@@ -90,7 +90,10 @@ const App: React.FC = () => {
     // Cargar logs desde la DB real al entrar como Admin/Dueña
     if (activeRole === Role.OWNER) {
       fetch('/api/logs')
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error("Error fetching logs");
+            return res.json();
+        })
         .then(dbLogs => {
            if(Array.isArray(dbLogs)) setAuditLogs(dbLogs);
         })

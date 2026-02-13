@@ -138,9 +138,8 @@ const LandingPage: React.FC<LoginProps> = ({ onLogin }) => {
                   <input 
                     type={loginMode === 'STUDENT' ? "text" : showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(e) => setPassword(loginMode === 'STUDENT' ? e.target.value.replace(/[^0-9]/g, '') : e.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder={placeholderPass}
-                    maxLength={loginMode === 'STUDENT' ? 8 : undefined}
                     className="w-full bg-zinc-50 border-zinc-200 focus:border-next-green focus:bg-white border-2 rounded-2xl px-6 py-4 text-sm font-bold outline-none transition-all placeholder:text-zinc-400 text-black pr-12"
                   />
                   {loginMode !== 'STUDENT' && (
@@ -153,7 +152,6 @@ const LandingPage: React.FC<LoginProps> = ({ onLogin }) => {
                     </button>
                   )}
                 </div>
-                {loginMode === 'STUDENT' && <p className="text-[8px] text-right text-zinc-500 font-bold uppercase tracking-wide pr-2">Formato: 8 Dígitos (DDMMAAAA)</p>}
               </div>
               <button 
                 type="submit" 

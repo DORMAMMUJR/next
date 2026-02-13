@@ -16,6 +16,75 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
+// --- INICIALIZACIÓN DE TABLAS (SCHEMA) ---
+// Esto asegura que las tablas existan al arrancar el servidor y evita errores 500
+const initSchema = async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS docentes (
+        id TEXT PRIMARY KEY,
+        nombre_completo TEXT,
+        sede_slug TEXT,
+        email TEXT,
+        especialidad TEXT
+      );
+      
+      CREATE TABLE IF NOT EXISTS alumnos (
+        id TEXT PRIMARY KEY,
+        nombre_completo TEXT,
+        matricula TEXT,
+        fecha_nacimiento TEXT,
+        docente_id TEXT,
+        grupo TEXT,
+        generacion TEXT,
+        financial_status TEXT DEFAULT 'CLEAN',
+        estatus TEXT DEFAULT 'Activo',
+        calificacion_parcial NUMERIC DEFAULT 0,
+        telefono TEXT,
+        email TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS pagos (
+        id TEXT PRIMARY KEY,
+        alumno_id TEXT,
+        concepto TEXT,
+        monto NUMERIC,
+        fecha_pago TIMESTAMP DEFAULT NOW(),
+        metodo TEXT,
+        estatus TEXT,
+        verified BOOLEAN DEFAULT FALSE,
+        proof_url TEXT
+      );
+
+      CREATE TABLE IF NOT EXISTS matriculas (
+        id TEXT PRIMARY KEY,
+        alumno_id TEXT,
+        matricula TEXT,
+        fecha_inscripcion TIMESTAMP DEFAULT NOW(),
+        programa TEXT,
+        turno TEXT,
+        modalidad TEXT
+      );
+
+      CREATE TABLE IF NOT EXISTS audit_logs (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        role TEXT,
+        action TEXT,
+        details TEXT,
+        timestamp TIMESTAMP DEFAULT NOW()
+      );
+    `);
+    console.log("✅ Tablas de base de datos verificadas.");
+  } catch (err) {
+    console.error("❌ Error inicializando esquema de DB:", err);
+  }
+};
+
+// Ejecutar inicialización
+initSchema();
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'dist')));
 
