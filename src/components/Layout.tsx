@@ -19,13 +19,17 @@ interface LayoutProps {
   onHome?: () => void;
   activeTab?: any;
   onTabChange?: (tab: any) => void;
+  // TEMA
+  theme: string;
+  toggleTheme: () => void;
   // BÚSQUEDA GLOBAL
   searchData?: { alumnos: any[], docentes: any[] };
 }
 
 const Layout: React.FC<LayoutProps> = ({
   children, activeSede, onSedeSelect, onLogout,
-  currentView, onNavigate, searchData, availableSedes // <-- Desestructuramos availableSedes
+  currentView, onNavigate, searchData, availableSedes,
+  theme, toggleTheme // <-- Desestructuramos theme y toggleTheme
 }) => {
 
   // Función auxiliar para las clases de los botones del menú
